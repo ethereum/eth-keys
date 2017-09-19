@@ -15,18 +15,18 @@ readme = open(os.path.join(DIR, 'README.md')).read()
 
 
 setup(
-    name='ethereum-utils',
-    version='0.2.1',
-    description="""Common utility functions for ethereum codebases.""",
+    name='ethereum-keys',
+    version='0.1.0',
+    description="""Common API for Ethereum key operations.""",
     long_description=readme,
     author='Piper Merriam',
     author_email='pipermerriam@gmail.com',
-    url='https://github.com/pipermerriam/ethereum-utils',
+    url='https://github.com/pipermerriam/ethereum-keys',
     include_package_data=True,
     install_requires=[
         "pysha3>=0.3",
     ],
-    py_modules=['eth_utils'],
+    py_modules=['eth_keys'],
     license="MIT",
     zip_safe=False,
     keywords='ethereum',
