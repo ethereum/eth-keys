@@ -15,7 +15,7 @@ MSGHASH = keccak(MSG)
 # with the following code:
 """
 from devp2p import crypto
-from rlp.utils import encode_hex
+from eth_utils import encode_hex
 msg = b'message'
 msghash = crypto.sha3(b'message')
 for secret in ['alice', 'bob', 'eve']:
