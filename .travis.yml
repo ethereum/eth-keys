@@ -1,6 +1,7 @@
 language: python
 python:
   - "3.5"
+  - "2.7"
 dist: trusty
 sudo: required
 addons:
@@ -18,6 +19,14 @@ env:
     - TOX_ENV=py34
     - TOX_ENV=py35
     - TOX_ENV=flake8
+matrix:
+  exclude:
+  - python: "2.7"
+    env: TOX_ENV=py34
+  - python: "2.7"
+    env: TOX_ENV=py35
+  - python: "3.5"
+    env: TOX_ENV=py27
 cache:
   pip: true
 install:
