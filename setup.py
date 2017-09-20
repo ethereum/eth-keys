@@ -24,7 +24,8 @@ setup(
     url='https://github.com/pipermerriam/ethereum-keys',
     include_package_data=True,
     install_requires=[
-        "pysha3>=0.3",
+        "ethereum-utils==0.4.0",
+        "cytoolz==0.8.2",
     ],
     py_modules=['eth_keys'],
     license="MIT",

@@ -1,6 +1,17 @@
 language: python
 python:
   - "3.5"
+dist: trusty
+sudo: required
+addons:
+  apt:
+    packages:
+    - build-essential
+    - automake
+    - pkg-config
+    - libtool
+    - libffi-dev
+    - libgmp-dev
 env:
   matrix:
     - TOX_ENV=py27
