@@ -26,7 +26,6 @@ if sys.version_info.major == 2:
             return int(codecs.encode(value, 'hex'), 16)
 
     int_to_byte = chr
-    byte_to_int = ord
 else:
     import math
 
@@ -39,5 +38,3 @@ else:
 
     def int_to_byte(value):
         return bytes([value])
-
-    byte_to_int = ord

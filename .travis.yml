@@ -1,12 +1,25 @@
 language: python
-python:
-  - "3.5"
-env:
-  matrix:
-    - TOX_ENV=py27
-    - TOX_ENV=py34
-    - TOX_ENV=py35
-    - TOX_ENV=flake8
+dist: trusty
+sudo: required
+addons:
+  apt:
+    packages:
+    - build-essential
+    - automake
+    - pkg-config
+    - libtool
+    - libffi-dev
+    - libgmp-dev
+matrix:
+  include:
+  - python: "2.7"
+    env: TOX_ENV=py27
+  - python: "3.4"
+    env: TOX_ENV=py34
+  - python: "3.5"
+    env: TOX_ENV=flake8
+  - python: "3.5"
+    env: TOX_ENV=py35
 cache:
   pip: true
 install:

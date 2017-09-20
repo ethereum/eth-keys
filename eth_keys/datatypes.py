@@ -1,5 +1,6 @@
 import codecs
 import collections
+import sys
 
 from cytoolz import (
     partial,
@@ -34,7 +35,17 @@ from eth_keys.validation import (
 pad32 = partial(pad_left, to_size=32, pad_with=b'\x00')
 
 
-class BaseKey(collections.abc.ByteString):
+try:
+    ByteString = collections.abc.ByteString
+except AttributeError:
+    ByteString = type(
+        'BaseString',
+        (collections.Sequence, basestring),  # noqa: F821
+        {},
+    )
+
+
+class BaseKey(ByteString):
     _backend = None
     _raw_key = None
 
@@ -45,11 +56,17 @@ class BaseKey(collections.abc.ByteString):
         else:
             return self._backend
 
+    def _as_hex(self):
+        return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
+
     def __bytes__(self):
         return self._raw_key
 
     def __str__(self):
-        return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
+        if sys.version_info.major == 2:
+            return self.__bytes__()
+        else:
+            return self._as_hex()
 
     def __unicode__(self):
         return self.__str__()
@@ -65,6 +82,9 @@ class BaseKey(collections.abc.ByteString):
 
     def __eq__(self, other):
         return bytes(self) == bytes(other)
+
+    def __repr__(self):
+        return self._as_hex()
 
 
 class PublicKey(BaseKey):
@@ -100,7 +120,7 @@ class PrivateKey(BaseKey):
         raise NotImplementedError("Not yet implemented")
 
 
-class Signature(collections.abc.ByteString):
+class Signature(ByteString):
     _backend = None
     _v = None
     _r = None
@@ -113,7 +133,7 @@ class Signature(collections.abc.ByteString):
             validate_signature_bytes(signature_bytes)
             self.r = big_endian_to_int(signature_bytes[0:32])
             self.s = big_endian_to_int(signature_bytes[32:64])
-            self.v = signature_bytes[64] + 27
+            self.v = ord(signature_bytes[64:65]) + 27
         elif vrs:
             v, r, s, = vrs
             self.v = v
@@ -179,6 +199,9 @@ class Signature(collections.abc.ByteString):
     def vrs(self):
         return (self.v, self.r, self.s)
 
+    def _as_hex(self):
+        return '0x' + codecs.decode(codecs.encode(bytes(self), 'hex'), 'ascii')
+
     def __bytes__(self):
         vb = int_to_byte(self.v - 27)
         rb = pad32(int_to_big_endian(self.r))
@@ -186,7 +209,10 @@ class Signature(collections.abc.ByteString):
         return b''.join((rb, sb, vb))
 
     def __str__(self):
-        return '0x' + codecs.decode(codecs.encode(bytes(self), 'hex'), 'ascii')
+        if sys.version_info.major == 2:
+            return self.__bytes__()
+        else:
+            return self._as_hex()
 
     def __unicode__(self):
         return self.__str__()
@@ -196,3 +222,6 @@ class Signature(collections.abc.ByteString):
 
     def __getitem__(self, index):
         return bytes(self)[index]
+
+    def __repr__(self):
+        return self._as_hex()
