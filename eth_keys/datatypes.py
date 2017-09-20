@@ -38,7 +38,11 @@ pad32 = partial(pad_left, to_size=32, pad_with=b'\x00')
 try:
     ByteString = collections.abc.ByteString
 except AttributeError:
-    ByteString = collections.Sequence
+    ByteString = type(
+        'BaseString',
+        (collections.Sequence, basestring),  # noqa: F821
+        {},
+    )
 
 
 class BaseKey(ByteString):
