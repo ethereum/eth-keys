@@ -6,25 +6,18 @@ from eth_keys.datatypes import (
 
 
 class BaseECCBackend(object):
-    @property
-    def PublicKey(self):
-        return type(
+    def __init__(self):
+        self.PublicKey = type(
             '{0}PublicKey'.format(type(self).__name__),
             (PublicKey,),
             {'_backend': self},
         )
-
-    @property
-    def PrivateKey(self):
-        return type(
+        self.PrivateKey = type(
             '{0}PrivateKey'.format(type(self).__name__),
             (PrivateKey,),
             {'_backend': self},
         )
-
-    @property
-    def Signature(self):
-        return type(
+        self.Signature = type(
             '{0}Signature'.format(type(self).__name__),
             (Signature,),
             {'_backend': self},

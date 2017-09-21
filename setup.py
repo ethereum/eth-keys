@@ -11,18 +11,16 @@ from setuptools import (
 DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-readme = open(os.path.join(DIR, 'README.md')).read()
-
-
 setup(
     name='ethereum-keys',
     version='0.1.0',
     description="""Common API for Ethereum key operations.""",
-    long_description=readme,
+    long_description_markdown_filename='README.md',
     author='Piper Merriam',
     author_email='pipermerriam@gmail.com',
     url='https://github.com/pipermerriam/ethereum-keys',
     include_package_data=True,
+    setup_requires=['setuptools-markdown'],
     install_requires=[
         "ethereum-utils>=0.4.0",
         "cytoolz>=0.8.2",

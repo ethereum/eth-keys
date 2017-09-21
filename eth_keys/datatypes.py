@@ -1,23 +1,25 @@
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import codecs
 import collections
 import sys
 
-from cytoolz import (
-    partial,
-)
-
 from eth_utils import (
-    pad_left,
-)
-
-from eth_keys import (
-    get_backend,
-)
-
-from eth_keys.utils.numeric import (
     big_endian_to_int,
     int_to_big_endian,
+    keccak,
+    to_checksum_address,
+)
+
+from eth_keys.utils.address import (
+    public_key_bytes_to_address,
+)
+from eth_keys.utils.numeric import (
     int_to_byte,
+)
+from eth_keys.utils.padding import (
+    pad32,
 )
 
 from eth_keys.validation import (
@@ -32,29 +34,40 @@ from eth_keys.validation import (
 )
 
 
-pad32 = partial(pad_left, to_size=32, pad_with=b'\x00')
-
-
 try:
     ByteString = collections.abc.ByteString
 except AttributeError:
     ByteString = type(
-        'BaseString',
+        b'BaseString',
         (collections.Sequence, basestring),  # noqa: F821
         {},
     )
 
 
-class BaseKey(ByteString):
+class BackendProxied(object):
     _backend = None
-    _raw_key = None
 
     @property
     def backend(self):
+        from eth_keys.backends import get_backend
+
         if self._backend is None:
             return get_backend()
         else:
             return self._backend
+
+    @classmethod
+    def get_backend(cls):
+        from eth_keys.backends import get_backend
+
+        if cls._backend is None:
+            return get_backend()
+        else:
+            return cls._backend
+
+
+class BaseKey(ByteString):
+    _raw_key = None
 
     def _as_hex(self):
         return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
@@ -84,29 +97,40 @@ class BaseKey(ByteString):
         return bytes(self) == bytes(other)
 
     def __repr__(self):
-        return self._as_hex()
+        return "'{0}'".format(self._as_hex())
 
 
-class PublicKey(BaseKey):
+class PublicKey(BaseKey, BackendProxied):
     def __init__(self, public_key_bytes):
         validate_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
 
     @classmethod
-    def from_private(self, private_key):
-        pass
+    def from_private(cls, private_key):
+        return cls.get_backend().private_key_to_public_key(private_key)
 
     @classmethod
-    def recover(self, signature):
-        # return instantiated public key
-        raise NotImplementedError("Not yet implemented")
+    def recover_msg(cls, message, signature):
+        message_hash = keccak(message)
+        return cls.recover_msg_hash(message_hash, signature)
 
-    def verify(self, signature):
-        raise NotImplementedError("Not yet implemented")
+    @classmethod
+    def recover_msg_hash(cls, message_hash, signature):
+        return cls.get_backend().ecdsa_recover(message_hash, signature)
+
+    def verify_msg(self, message, signature):
+        message_hash = keccak(message)
+        return self.verify_msg_hash(message_hash, signature)
+
+    def verify_msg_hash(self, message_hash, signature):
+        return self.backend.ecdsa_verify(message_hash, signature, self)
+
+    def to_address(self):
+        return to_checksum_address(public_key_bytes_to_address(bytes(self)))
 
 
-class PrivateKey(BaseKey):
+class PrivateKey(BaseKey, BackendProxied):
     public_key = None
 
     def __init__(self, private_key_bytes):
@@ -117,10 +141,14 @@ class PrivateKey(BaseKey):
         self.public_key = self.backend.private_key_to_public_key(self)
 
     def sign(self, message):
-        raise NotImplementedError("Not yet implemented")
+        message_hash = keccak(message)
+        return self.sign_hash(message_hash)
+
+    def sign_hash(self, message_hash):
+        return self.backend.ecdsa_sign(message_hash, self)
 
 
-class Signature(ByteString):
+class Signature(ByteString, BackendProxied):
     _backend = None
     _v = None
     _r = None
@@ -141,13 +169,6 @@ class Signature(ByteString):
             self.s = s
         else:
             raise TypeError("Invariant: unreachable code path")
-
-    @property
-    def backend(self):
-        if self._backend is None:
-            return get_backend()
-        else:
-            return self._backend
 
     #
     # v
@@ -224,4 +245,18 @@ class Signature(ByteString):
         return bytes(self)[index]
 
     def __repr__(self):
-        return self._as_hex()
+        return "'{0}'".format(self._as_hex())
+
+    def verify_msg(self, message, public_key):
+        message_hash = keccak(message)
+        return self.verify_msg_hash(message_hash, public_key)
+
+    def verify_msg_hash(self, message_hash, public_key):
+        return self.backend.ecdsa_verify(message_hash, self, public_key)
+
+    def recover_msg(self, message):
+        message_hash = keccak(message)
+        return self.recover_msg_hash(message_hash)
+
+    def recover_msg_hash(self, message_hash):
+        return self.backend.ecdsa_recover(message_hash, self)
