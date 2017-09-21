@@ -12,6 +12,7 @@ class CoinCurveECCBackend(BaseECCBackend):
                                library which is not available for import.")
         self.keys = coincurve.keys
         self.ecdsa = coincurve.ecdsa
+        super(CoinCurveECCBackend, self).__init__()
 
     def ecdsa_sign(self, msg_hash, private_key):
         private_key_bytes = bytes(private_key)

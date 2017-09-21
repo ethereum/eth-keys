@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import codecs
 import collections
@@ -96,7 +97,7 @@ class BaseKey(ByteString):
         return bytes(self) == bytes(other)
 
     def __repr__(self):
-        return self._as_hex()
+        return "'{0}'".format(self._as_hex())
 
 
 class PublicKey(BaseKey, BackendProxied):
@@ -110,10 +111,19 @@ class PublicKey(BaseKey, BackendProxied):
         return cls.get_backend().private_key_to_public_key(private_key)
 
     @classmethod
-    def recover(cls, message_hash, signature):
+    def recover_msg(cls, message, signature):
+        message_hash = keccak(message)
+        return cls.recover_msg_hash(message_hash, signature)
+
+    @classmethod
+    def recover_msg_hash(cls, message_hash, signature):
         return cls.get_backend().ecdsa_recover(message_hash, signature)
 
-    def verify(self, message_hash, signature):
+    def verify_msg(self, message, signature):
+        message_hash = keccak(message)
+        return self.verify_msg_hash(message_hash, signature)
+
+    def verify_msg_hash(self, message_hash, signature):
         return self.backend.ecdsa_verify(message_hash, signature, self)
 
     def to_address(self):
@@ -235,10 +245,18 @@ class Signature(ByteString, BackendProxied):
         return bytes(self)[index]
 
     def __repr__(self):
-        return self._as_hex()
+        return "'{0}'".format(self._as_hex())
 
-    def verify(self, msg_hash, public_key):
-        return self.backend.ecdsa_verify(msg_hash, self, public_key)
+    def verify_msg(self, message, public_key):
+        message_hash = keccak(message)
+        return self.verify_msg_hash(message_hash, public_key)
 
-    def recover(self, msg_hash):
-        return self.backend.ecdsa_recover(msg_hash, self)
+    def verify_msg_hash(self, message_hash, public_key):
+        return self.backend.ecdsa_verify(message_hash, self, public_key)
+
+    def recover_msg(self, message):
+        message_hash = keccak(message)
+        return self.recover_msg_hash(message_hash)
+
+    def recover_msg_hash(self, message_hash):
+        return self.backend.ecdsa_recover(message_hash, self)

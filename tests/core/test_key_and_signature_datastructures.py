@@ -45,8 +45,9 @@ def test_hash_signing_from_private_key_obj(ecc_backend, private_key):
 
 def test_recover_from_public_key_class(ecc_backend, private_key):
     signature = ecc_backend.ecdsa_sign(MSGHASH, private_key)
-    public_key = ecc_backend.PublicKey.recover(MSGHASH, signature)
+    public_key = ecc_backend.PublicKey.recover_msg_hash(MSGHASH, signature)
 
+    assert public_key == ecc_backend.PublicKey.recover_msg(MSG, signature)
     assert public_key == private_key.public_key
 
 
@@ -54,11 +55,18 @@ def test_verify_from_public_key_obj(ecc_backend, private_key):
     signature = ecc_backend.ecdsa_sign(MSGHASH, private_key)
     public_key = private_key.public_key
 
-    assert public_key.verify(MSGHASH, signature)
+    assert public_key.verify_msg_hash(MSGHASH, signature)
+    assert public_key.verify_msg(MSG, signature)
 
 
-def test_from_private_for_public_key_clasS(ecc_backend, private_key):
+def test_from_private_for_public_key_class(ecc_backend, private_key):
     public_key = ecc_backend.PublicKey.from_private(private_key)
+
+    assert public_key == private_key.public_key
+
+
+def test_from_private_bytes_for_public_key_class(ecc_backend, private_key):
+    public_key = ecc_backend.PublicKey.from_private(bytes(private_key))
 
     assert public_key == private_key.public_key
 
@@ -66,13 +74,15 @@ def test_from_private_for_public_key_clasS(ecc_backend, private_key):
 def test_verify_from_signature_obj(ecc_backend, private_key):
     signature = ecc_backend.ecdsa_sign(MSGHASH, private_key)
 
-    assert signature.verify(MSGHASH, private_key.public_key)
+    assert signature.verify_msg_hash(MSGHASH, private_key.public_key)
+    assert signature.verify_msg(MSG, private_key.public_key)
 
 
 def test_recover_from_signature_obj(ecc_backend, private_key):
     signature = ecc_backend.ecdsa_sign(MSGHASH, private_key)
-    public_key = signature.recover(MSGHASH)
+    public_key = signature.recover_msg_hash(MSGHASH)
 
+    assert public_key == signature.recover_msg(MSG)
     assert public_key == private_key.public_key
 
 

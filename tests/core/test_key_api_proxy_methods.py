@@ -52,7 +52,7 @@ def test_key_api_ecdsa_sign_validation(key_api, private_key):
         key_api.ecdsa_sign(MSG, private_key)
 
     signature = key_api.ecdsa_sign(MSGHASH, private_key)
-    assert signature.verify(MSGHASH, private_key.public_key)
+    assert signature.verify_msg_hash(MSGHASH, private_key.public_key)
 
 
 def test_key_api_ecdsa_verify_validation(key_api, signature, public_key):
