@@ -66,7 +66,7 @@ class BackendProxied(object):
             return cls._backend
 
 
-class BaseKey(ByteString):
+class BaseKey(ByteString, collections.Hashable):
     _raw_key = None
 
     def _as_hex(self):
@@ -74,6 +74,9 @@ class BaseKey(ByteString):
 
     def __bytes__(self):
         return self._raw_key
+
+    def __hash__(self):
+        return big_endian_to_int(keccak(bytes(self)))
 
     def __str__(self):
         if sys.version_info.major == 2:
@@ -222,6 +225,9 @@ class Signature(ByteString, BackendProxied):
 
     def _as_hex(self):
         return '0x' + codecs.decode(codecs.encode(bytes(self), 'hex'), 'ascii')
+
+    def __hash__(self):
+        return big_endian_to_int(keccak(bytes(self)))
 
     def __bytes__(self):
         vb = int_to_byte(self.v - 27)
