@@ -3,12 +3,6 @@ import os
 from eth_keys.utils.module_loading import (
     import_string,
 )
-from eth_keys.keyfile import (  # noqa: F401
-    load_keyfile,
-    create_keyfile_json,
-    decode_keyfile_json,
-    extract_key_from_keyfile,
-)
 
 
 DEFAULT_ECC_BACKEND = 'eth_keys.backends.coincurve.CoinCurveECCBackend'
