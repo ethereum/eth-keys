@@ -2,12 +2,9 @@ import codecs
 import collections
 import sys
 
-from cytoolz import (
-    partial,
-)
-
 from eth_utils import (
-    pad_left,
+    big_endian_to_int,
+    int_to_big_endian,
 )
 
 from eth_keys import (
@@ -15,9 +12,10 @@ from eth_keys import (
 )
 
 from eth_keys.utils.numeric import (
-    big_endian_to_int,
-    int_to_big_endian,
     int_to_byte,
+)
+from eth_keys.utils.padding import (
+    pad32,
 )
 
 from eth_keys.validation import (
@@ -30,9 +28,6 @@ from eth_keys.validation import (
     validate_signature_bytes,
     validate_integer,
 )
-
-
-pad32 = partial(pad_left, to_size=32, pad_with=b'\x00')
 
 
 try:

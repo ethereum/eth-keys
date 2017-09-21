@@ -5,7 +5,7 @@ from eth_keys.utils.module_loading import (
 )
 
 
-DEFAULT_ECC_BACKEND = 'eth_keys.backends.coincurve.CoinCurveECCBackend'
+DEFAULT_ECC_BACKEND = 'eth_keys.backends.native.NativeECCBackend'
 
 
 def get_backend_class(import_path=None):
