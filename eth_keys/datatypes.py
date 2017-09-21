@@ -10,6 +10,7 @@ from eth_utils import (
     int_to_big_endian,
     keccak,
     to_checksum_address,
+    to_normalized_address,
 )
 
 from eth_keys.utils.address import (
@@ -129,8 +130,17 @@ class PublicKey(BaseKey, BackendProxied):
     def verify_msg_hash(self, message_hash, signature):
         return self.backend.ecdsa_verify(message_hash, signature, self)
 
-    def to_address(self):
+    #
+    # Ethereum address conversions
+    #
+    def to_checksum_address(self):
         return to_checksum_address(public_key_bytes_to_address(bytes(self)))
+
+    def to_address(self):
+        return to_normalized_address(public_key_bytes_to_address(bytes(self)))
+
+    def to_canonical_address(self):
+        return public_key_bytes_to_address(bytes(self))
 
 
 class PrivateKey(BaseKey, BackendProxied):

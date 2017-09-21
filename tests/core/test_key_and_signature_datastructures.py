@@ -6,6 +6,9 @@ from eth_utils import (
     decode_hex,
     keccak,
     is_same_address,
+    is_normalized_address,
+    is_checksum_address,
+    is_canonical_address,
 )
 
 from eth_keys.backends import NativeECCBackend
@@ -88,4 +91,17 @@ def test_recover_from_signature_obj(ecc_backend, private_key):
 
 def test_to_address_from_public_key(private_key):
     address = private_key.public_key.to_address()
+    assert is_normalized_address(address)
+    assert is_same_address(address, ADDRESS)
+
+
+def test_to_checksum_address_from_public_key(private_key):
+    address = private_key.public_key.to_checksum_address()
+    assert is_checksum_address(address)
+    assert is_same_address(address, ADDRESS)
+
+
+def test_to_canonical_address_from_public_key(private_key):
+    address = private_key.public_key.to_canonical_address()
+    assert is_canonical_address(address)
     assert is_same_address(address, ADDRESS)
