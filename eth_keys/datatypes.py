@@ -38,7 +38,7 @@ try:
     ByteString = collections.abc.ByteString
 except AttributeError:
     ByteString = type(
-        'BaseString',
+        b'BaseString',
         (collections.Sequence, basestring),  # noqa: F821
         {},
     )
