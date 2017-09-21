@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import codecs
 import collections
 import sys
@@ -5,10 +7,7 @@ import sys
 from eth_utils import (
     big_endian_to_int,
     int_to_big_endian,
-)
-
-from eth_keys import (
-    get_backend,
+    keccak,
 )
 
 from eth_keys.utils.numeric import (
@@ -40,16 +39,30 @@ except AttributeError:
     )
 
 
-class BaseKey(ByteString):
+class BackendProxied(object):
     _backend = None
-    _raw_key = None
 
     @property
     def backend(self):
+        from eth_keys.backends import get_backend
+
         if self._backend is None:
             return get_backend()
         else:
             return self._backend
+
+    @classmethod
+    def get_backend(cls):
+        from eth_keys.backends import get_backend
+
+        if cls._backend is None:
+            return get_backend()
+        else:
+            return cls._backend
+
+
+class BaseKey(ByteString):
+    _raw_key = None
 
     def _as_hex(self):
         return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
@@ -82,26 +95,25 @@ class BaseKey(ByteString):
         return self._as_hex()
 
 
-class PublicKey(BaseKey):
+class PublicKey(BaseKey, BackendProxied):
     def __init__(self, public_key_bytes):
         validate_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
 
     @classmethod
-    def from_private(self, private_key):
-        pass
+    def from_private(cls, private_key):
+        return cls.get_backend().private_key_to_public_key(private_key)
 
     @classmethod
-    def recover(self, signature):
-        # return instantiated public key
-        raise NotImplementedError("Not yet implemented")
+    def recover(cls, message_hash, signature):
+        return cls.get_backend().ecdsa_recover(message_hash, signature)
 
-    def verify(self, signature):
-        raise NotImplementedError("Not yet implemented")
+    def verify(self, message_hash, signature):
+        return self.backend.ecdsa_verify(message_hash, signature, self)
 
 
-class PrivateKey(BaseKey):
+class PrivateKey(BaseKey, BackendProxied):
     public_key = None
 
     def __init__(self, private_key_bytes):
@@ -112,10 +124,14 @@ class PrivateKey(BaseKey):
         self.public_key = self.backend.private_key_to_public_key(self)
 
     def sign(self, message):
-        raise NotImplementedError("Not yet implemented")
+        message_hash = keccak(message)
+        return self.sign_hash(message_hash)
+
+    def sign_hash(self, message_hash):
+        return self.backend.ecdsa_sign(message_hash, self)
 
 
-class Signature(ByteString):
+class Signature(ByteString, BackendProxied):
     _backend = None
     _v = None
     _r = None
@@ -136,13 +152,6 @@ class Signature(ByteString):
             self.s = s
         else:
             raise TypeError("Invariant: unreachable code path")
-
-    @property
-    def backend(self):
-        if self._backend is None:
-            return get_backend()
-        else:
-            return self._backend
 
     #
     # v
@@ -220,3 +229,9 @@ class Signature(ByteString):
 
     def __repr__(self):
         return self._as_hex()
+
+    def verify(self, msg_hash, public_key):
+        return self.backend.ecdsa_verify(msg_hash, self, public_key)
+
+    def recover(self, msg_hash):
+        return self.backend.ecdsa_recover(msg_hash, self)

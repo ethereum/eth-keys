@@ -12,14 +12,23 @@ addons:
     - libgmp-dev
 matrix:
   include:
-  - python: "2.7"
-    env: TOX_ENV=py27
-  - python: "3.4"
-    env: TOX_ENV=py34
+  # lint
   - python: "3.5"
     env: TOX_ENV=flake8
+  # core
+  - python: "2.7"
+    env: TOX_ENV=py27-core
+  - python: "3.4"
+    env: TOX_ENV=py34-core
   - python: "3.5"
-    env: TOX_ENV=py35
+    env: TOX_ENV=py35-core
+  # backends
+  - python: "2.7"
+    env: TOX_ENV=py27-backends
+  - python: "3.4"
+    env: TOX_ENV=py34-backends
+  - python: "3.5"
+    env: TOX_ENV=py35-backends
 cache:
   pip: true
 install:
