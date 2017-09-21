@@ -2,6 +2,7 @@ import pytest
 
 from hypothesis import (
     given,
+    settings,
     strategies as st,
 )
 
@@ -32,6 +33,8 @@ message_hash_st = st.binary(min_size=32, max_size=32)
 MSG = b'message'
 MSGHASH = keccak(MSG)
 
+MAX_EXAMPLES = 200
+
 
 @pytest.fixture
 def native_backend():
@@ -44,6 +47,7 @@ def coincurve_backend():
 
 
 @given(private_key_bytes=private_key_st)
+@settings(max_examples=MAX_EXAMPLES)
 def test_public_key_generation_is_equal(private_key_bytes,
                                         native_backend,
                                         coincurve_backend):
@@ -54,6 +58,7 @@ def test_public_key_generation_is_equal(private_key_bytes,
 
 
 @given(private_key_bytes=private_key_st, message_hash=message_hash_st)
+@settings(max_examples=MAX_EXAMPLES)
 def test_native_to_coincurve_recover(private_key_bytes,
                                      message_hash,
                                      native_backend,
@@ -66,6 +71,7 @@ def test_native_to_coincurve_recover(private_key_bytes,
 
 
 @given(private_key_bytes=private_key_st, message_hash=message_hash_st)
+@settings(max_examples=MAX_EXAMPLES)
 def test_coincurve_to_native_recover(private_key_bytes,
                                      message_hash,
                                      native_backend,
