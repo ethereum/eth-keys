@@ -33,7 +33,7 @@ message_hash_st = st.binary(min_size=32, max_size=32)
 MSG = b'message'
 MSGHASH = keccak(MSG)
 
-MAX_EXAMPLES = 10000
+MAX_EXAMPLES = 200
 
 
 @pytest.fixture
