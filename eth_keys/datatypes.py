@@ -8,8 +8,12 @@ from eth_utils import (
     big_endian_to_int,
     int_to_big_endian,
     keccak,
+    to_checksum_address,
 )
 
+from eth_keys.utils.address import (
+    public_key_bytes_to_address,
+)
 from eth_keys.utils.numeric import (
     int_to_byte,
 )
@@ -111,6 +115,9 @@ class PublicKey(BaseKey, BackendProxied):
 
     def verify(self, message_hash, signature):
         return self.backend.ecdsa_verify(message_hash, signature, self)
+
+    def to_address(self):
+        return to_checksum_address(public_key_bytes_to_address(bytes(self)))
 
 
 class PrivateKey(BaseKey, BackendProxied):
