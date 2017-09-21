@@ -13,7 +13,7 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 
 setup(
     name='ethereum-keys',
-    version='0.1.0-alpha.1',
+    version='0.1.0-alpha.2',
     description="""Common API for Ethereum key operations.""",
     long_description_markdown_filename='README.md',
     author='Piper Merriam',
