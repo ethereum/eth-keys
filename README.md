@@ -60,6 +60,42 @@ The `backend` argument can be given in any of the following forms.
 >>> keys = KeyAPI('eth_keys.backends.CoinCurveECCBackend')
 ```
 
+### `KeyAPI.ecdsa_sign(message_hash, private_key) -> Signature`
+
+This method returns a signature for the given `message_hash`, signed by the
+provided `public_key`.
+
+* `message_hash`: **must** be a byte string of length 32
+* `private_key`: **must** be an instance of `PrivateKey`
+
+
+### `KeyAPI.ecdsa_verify(message_hash, signature, public_key) -> bool`
+
+Returns `True` or `False` based on whether the provided `signature` is a valid
+signature for the provided `message_hash` and `public_key`.
+
+* `message_hash`: **must** be a byte string of length 32
+* `signature`: **must** be an instance of `Signature`
+* `public_key`: **must** be an instance of `PublicKey`
+
+
+### `KeyAPI.ecdsa_recover(message_hash, signature) -> PublicKey`
+
+Returns the `PublicKey` instances recovered from the given `signature` and
+`message_hash`.
+
+* `message_hash`: **must** be a byte string of length 32
+* `signature`: **must** be an instance of `Signature`
+
+
+### `KeyAPI.private_key_to_public_key(private_key) -> PublicKey`
+
+Returns the `PublicKey` instances computed from the given `private_key`
+instance.
+
+* `private_key`: **must** be an instance of `PublicKey`
+
+
 ### `KeyAPI.PublicKey(public_key_bytes)`
 
 The `PublicKey` class takes a single argument which must be a bytes string with length 64.
@@ -107,3 +143,89 @@ hash of the `message`.
 #### `PublicKey.to_address() -> text`
 
 Returns the ERC55 checksum formatted ethereum address for this public key.
+
+
+### `KeyAPI.PrivateKey(private_key_bytes)`
+
+The `PrivateKey` class takes a single argument which must be a bytes string with length 32.
+
+The following methods and properties are available
+
+
+#### `PrivateKey.public_key`
+
+This *property* holds the `PublicKey` instance coresponding to this private key.
+
+
+#### `PrivateKey.sign(message) -> Signature`
+
+This method returns a signature for the given `message` in the form of a
+`Signature` instance
+
+* `message` **must** be a byte string.
+
+
+#### `PrivateKey.sign_hash(message_hash) -> Signature`
+
+Same as `PrivateKey.sign` except that `message_hash` should be the Keccak
+hash of the `message`.
+
+
+### `KeyAPI.Signature(signature_bytes=None, vrs=None)`
+
+The `Signature` class can be instantiated in one of two ways.
+
+* `signature_bytes`: a bytes string with length 65.
+* `vrs`: a 3-tuple composed of the integers `v`, `r`, and `s`.
+
+> Note: If using the `signature_bytes` to instantiate, the byte string should be encoded as `r_bytes | s_bytes | v_bytes` where `|` represents concatenation.  `r_bytes` and `s_bytes` should be 32 bytes in length.  `v_bytes` should be a single byte `\x00` or `\x01`.
+
+The following methods and properties are available
+
+
+#### `Signature.v`
+
+This property returns the `v` value from the signature as an integer.
+
+
+#### `Signature.r`
+
+This property returns the `r` value from the signature as an integer.
+
+
+#### `Signature.s`
+
+This property returns the `s` value from the signature as an integer.
+
+
+#### `Signature.vrs`
+
+This property returns a 3-tuple of `(v, r, s)`.
+
+
+#### `Signature.verify_msg(message, public_key) -> bool`
+
+This method returns `True` or `False` based on whether the signature is a valid
+for the given public key.
+
+* `message`: **must** be a byte string.
+* `public_key`: **must** be an instance of `PublicKey`
+
+
+#### `Signature.verify_msg_hash(message_hash, public_key) -> bool`
+
+Same as `Signature.verify_msg` except that `message_hash` should be the Keccak
+hash of the `message`.
+
+
+#### `Signature.recover_msg(message) -> PublicKey`
+
+This method returns a `PublicKey` instance recovered from the signature.
+
+* `message`: **must** be a byte string.
+
+
+#### `Signature.recover_msg_hash(message_hash) -> PublicKey`
+
+Same as `Signature.recover_msg` except that `message_hash` should be the Keccak
+hash of the `message`.

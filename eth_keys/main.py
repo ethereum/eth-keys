@@ -55,13 +55,13 @@ class KeyAPI(object):
     PrivateKey = backend_property_proxy('PrivateKey')  # noqa: F811
     Signature = backend_property_proxy('Signature')  # noqa: F811
 
-    def ecdsa_sign(self, msg_hash, private_key):
-        validate_message_hash(msg_hash)
+    def ecdsa_sign(self, message_hash, private_key):
+        validate_message_hash(message_hash)
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
                 "The `private_key` must be an instance of `eth_keys.datatypes.PrivateKey`"
             )
-        signature = self.backend.ecdsa_sign(msg_hash, private_key)
+        signature = self.backend.ecdsa_sign(message_hash, private_key)
         if not isinstance(signature, Signature):
             raise ValidationError(
                 "Backend returned an invalid signature.  Return value must be "
@@ -69,20 +69,20 @@ class KeyAPI(object):
             )
         return signature
 
-    def ecdsa_verify(self, msg_hash, signature, public_key):
+    def ecdsa_verify(self, message_hash, signature, public_key):
         if not isinstance(public_key, PublicKey):
             raise ValidationError(
                 "The `public_key` must be an instance of `eth_keys.datatypes.PublicKey`"
             )
-        return self.ecdsa_recover(msg_hash, signature) == public_key
+        return self.ecdsa_recover(message_hash, signature) == public_key
 
-    def ecdsa_recover(self, msg_hash, signature):
-        validate_message_hash(msg_hash)
+    def ecdsa_recover(self, message_hash, signature):
+        validate_message_hash(message_hash)
         if not isinstance(signature, Signature):
             raise ValidationError(
                 "The `signature` must be an instance of `eth_keys.datatypes.Signature`"
             )
-        public_key = self.backend.ecdsa_recover(msg_hash, signature)
+        public_key = self.backend.ecdsa_recover(message_hash, signature)
         if not isinstance(public_key, PublicKey):
             raise ValidationError(
                 "Backend returned an invalid public_key.  Return value must be "
