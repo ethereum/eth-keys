@@ -29,7 +29,6 @@ from eth_keys.exceptions import (
 )
 from eth_keys.validation import (
     validate_lt_secpk1n,
-    validate_lt_secpk1n2,
     validate_lte,
     validate_gte,
     validate_public_key_bytes,
@@ -244,7 +243,6 @@ class Signature(ByteString, BackendProxied):
         validate_integer(value)
         validate_gte(value, 0)
         validate_lt_secpk1n(value)
-        validate_lt_secpk1n2(value)
 
         self._s = value
 

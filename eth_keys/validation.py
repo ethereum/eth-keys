@@ -48,7 +48,6 @@ def validate_lte(value, maximum):
 
 
 validate_lt_secpk1n = validate_lte(maximum=SECPK1_N - 1)
-validate_lt_secpk1n2 = validate_lte(maximum=SECPK1_N // 2 - 1)
 
 
 def validate_message_hash(value):
