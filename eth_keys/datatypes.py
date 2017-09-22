@@ -107,7 +107,10 @@ class BaseKey(ByteString, collections.Hashable):
         return self.__int__()
 
     def __hex__(self):
-        return self._to_hex()
+        if sys.version_info.major == 2:
+            return codecs.encode(self._to_hex(), 'ascii')
+        else:
+            return self._to_hex()
 
 
 class PublicKey(BaseKey, BackendProxied):
@@ -287,7 +290,10 @@ class Signature(ByteString, BackendProxied):
         return self.__int__()
 
     def __hex__(self):
-        return self._to_hex()
+        if sys.version_info.major == 2:
+            return codecs.encode(self._to_hex(), 'ascii')
+        else:
+            return self._to_hex()
 
     def __int__(self):
         return big_endian_to_int(bytes(self))
