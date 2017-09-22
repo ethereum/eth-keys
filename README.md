@@ -239,3 +239,18 @@ This method returns a `PublicKey` instance recovered from the signature.
 
 Same as `Signature.recover_msg` except that `message_hash` should be the Keccak
 hash of the `message`.
+
+
+### Exceptions
+
+#### `eth_api.exceptions.ValidationError`
+
+This error is raised during instantaition of any of the `PublicKey`,
+`PrivateKey` or `Signature` classes if their constructor parameters are
+invalid.
+
+
+#### `eth_api.exceptions.BadSignature`
+
+This error is raised from any of the `recover` or `verify` methods involving
+signatures if the signature is invalid.

@@ -1,5 +1,9 @@
 from __future__ import absolute_import
 
+from eth_keys.exceptions import (
+    BadSignature,
+)
+
 from .base import BaseECCBackend
 
 
@@ -25,11 +29,16 @@ class CoinCurveECCBackend(BaseECCBackend):
 
     def ecdsa_recover(self, msg_hash, signature):
         signature_bytes = bytes(signature)
-        public_key_bytes = self.keys.PublicKey.from_signature_and_message(
-            signature_bytes,
-            msg_hash,
-            hasher=None,
-        ).format(compressed=False)[1:]
+        try:
+            public_key_bytes = self.keys.PublicKey.from_signature_and_message(
+                signature_bytes,
+                msg_hash,
+                hasher=None,
+            ).format(compressed=False)[1:]
+        except (ValueError, Exception) as err:
+            # `coincurve` can raise `ValueError` or `Exception` dependending on
+            # how the signature is invalid.
+            raise BadSignature(str(err))
         public_key = self.PublicKey(public_key_bytes)
         return public_key
 
