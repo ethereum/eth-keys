@@ -18,6 +18,9 @@ from eth_keys.constants import (
     SECPK1_A as A,
     SECPK1_B as B,
 )
+from eth_keys.exceptions import (
+    BadSignature,
+)
 
 from eth_keys.utils.numeric import (
     int_to_byte,
@@ -106,7 +109,7 @@ def ecdsa_raw_verify(msg_hash, vrs, public_key_bytes):
 
     v, r, s = vrs
     if not (27 <= v <= 34):
-        raise ValueError("Invalid Signature")
+        raise BadSignature("Invalid Signature")
 
     w = inv(s, N)
     z = big_endian_to_int(msg_hash)
@@ -123,7 +126,7 @@ def ecdsa_raw_recover(msg_hash, vrs):
     v, r, s = vrs
 
     if not (27 <= v <= 34):
-        raise ValueError("%d must in range 27-31" % v)
+        raise BadSignature("%d must in range 27-31" % v)
 
     x = r
 
@@ -133,7 +136,7 @@ def ecdsa_raw_recover(msg_hash, vrs):
     # If xcubedaxb is not a quadratic residue, then r cannot be the x coord
     # for a point on the curve, and so the sig is invalid
     if (xcubedaxb - y * y) % P != 0 or not (r % N) or not (s % N):
-        raise ValueError("Invalid signature")
+        raise BadSignature("Invalid signature")
     z = big_endian_to_int(msg_hash)
     Gz = jacobian_multiply((Gx, Gy, 1), (N - z) % N)
     XY = jacobian_multiply((x, y, 1), s)
