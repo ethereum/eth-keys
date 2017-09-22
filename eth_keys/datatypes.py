@@ -106,6 +106,9 @@ class BaseKey(ByteString, collections.Hashable):
     def __index__(self):
         return self.__int__()
 
+    def __hex__(self):
+        return self._to_hex()
+
 
 class PublicKey(BaseKey, BackendProxied):
     def __init__(self, public_key_bytes):
