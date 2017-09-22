@@ -187,7 +187,7 @@ class Signature(ByteString, BackendProxied):
             try:
                 self.r = big_endian_to_int(signature_bytes[0:32])
                 self.s = big_endian_to_int(signature_bytes[32:64])
-                self.v = ord(signature_bytes[64:65]) + 27
+                self.v = ord(signature_bytes[64:65])
             except ValidationError as err:
                 raise BadSignature(str(err))
         elif vrs:
@@ -211,6 +211,8 @@ class Signature(ByteString, BackendProxied):
     @v.setter
     def v(self, value):
         validate_integer(value)
+        if value in {0, 1}:
+            value += 27
         validate_gte(value, minimum=27)
         validate_lte(value, maximum=28)
 
