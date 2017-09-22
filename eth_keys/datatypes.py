@@ -103,6 +103,9 @@ class BaseKey(ByteString, collections.Hashable):
     def __repr__(self):
         return "'{0}'".format(self._as_hex())
 
+    def __index__(self):
+        return self.__int__()
+
 
 class PublicKey(BaseKey, BackendProxied):
     def __init__(self, public_key_bytes):
@@ -276,3 +279,9 @@ class Signature(ByteString, BackendProxied):
 
     def recover_msg_hash(self, message_hash):
         return self.backend.ecdsa_recover(message_hash, self)
+
+    def __index__(self):
+        return self.__int__()
+
+    def __int__(self):
+        return big_endian_to_int(bytes(self))

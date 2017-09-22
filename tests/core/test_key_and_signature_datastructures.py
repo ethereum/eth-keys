@@ -4,6 +4,7 @@ import pytest
 
 from eth_utils import (
     decode_hex,
+    encode_hex,
     keccak,
     is_same_address,
     is_normalized_address,
@@ -105,3 +106,12 @@ def test_to_canonical_address_from_public_key(private_key):
     address = private_key.public_key.to_canonical_address()
     assert is_canonical_address(address)
     assert is_same_address(address, ADDRESS)
+
+
+def test_hex_conversion(private_key):
+    public_key = private_key.public_key
+    signature = private_key.sign(b'message')
+
+    assert hex(public_key) == encode_hex(bytes(public_key))
+    assert hex(private_key) == encode_hex(bytes(private_key))
+    assert hex(signature) == encode_hex(bytes(signature))
