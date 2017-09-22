@@ -23,6 +23,10 @@ from eth_keys.utils.padding import (
     pad32,
 )
 
+from eth_keys.exceptions import (
+    ValidationError,
+    BadSignature,
+)
 from eth_keys.validation import (
     validate_lt_secpk1n,
     validate_lt_secpk1n2,
@@ -181,14 +185,20 @@ class Signature(ByteString, BackendProxied):
             raise TypeError("You must provide one of `signature_bytes` or `vrs`")
         elif signature_bytes:
             validate_signature_bytes(signature_bytes)
-            self.r = big_endian_to_int(signature_bytes[0:32])
-            self.s = big_endian_to_int(signature_bytes[32:64])
-            self.v = ord(signature_bytes[64:65]) + 27
+            try:
+                self.r = big_endian_to_int(signature_bytes[0:32])
+                self.s = big_endian_to_int(signature_bytes[32:64])
+                self.v = ord(signature_bytes[64:65]) + 27
+            except ValidationError as err:
+                raise BadSignature(str(err))
         elif vrs:
             v, r, s, = vrs
-            self.v = v
-            self.r = r
-            self.s = s
+            try:
+                self.v = v
+                self.r = r
+                self.s = s
+            except ValidationError as err:
+                raise BadSignature(str(err))
         else:
             raise TypeError("Invariant: unreachable code path")
 
