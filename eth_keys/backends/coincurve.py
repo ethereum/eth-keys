@@ -9,7 +9,7 @@ from .base import BaseECCBackend
 
 def is_coincurve_available():
     try:
-        import coincurve
+        import coincurve  # noqa: F401
     except ImportError:
         return False
     else:
