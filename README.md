@@ -96,6 +96,22 @@ instance.
 * `private_key`: **must** be an instance of `PublicKey`
 
 
+### Common APIs for `PublicKey`, `PrivateKey` and `Signature`
+
+There is a common API for the following objects.
+
+* `PublicKey`
+* `PrivateKey`
+* `Signature`
+
+Each of these objects has all of the following APIs.
+
+* `obj.to_bytes()`: Returns the object in it's canonical `bytes` serialization.
+* `obj.to_hex()`: Returns a text string of the hex encoded canonical representation.
+* `bytes(obj)`: Same as `obj.to_bytes()`
+* `hex(obj)`: Same as `obj.to_hex()`
+
+
 ### `KeyAPI.PublicKey(public_key_bytes)`
 
 The `PublicKey` class takes a single argument which must be a bytes string with length 64.
