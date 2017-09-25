@@ -73,8 +73,11 @@ class BackendProxied(object):
 class BaseKey(ByteString, collections.Hashable):
     _raw_key = None
 
-    def _to_hex(self):
+    def to_hex(self):
         return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
+
+    def to_bytes(self):
+        return self.__bytes__(self)
 
     def __bytes__(self):
         return self._raw_key
@@ -86,7 +89,7 @@ class BaseKey(ByteString, collections.Hashable):
         if sys.version_info.major == 2:
             return self.__bytes__()
         else:
-            return self._to_hex()
+            return self.to_hex()
 
     def __unicode__(self):
         return self.__str__()
@@ -104,16 +107,16 @@ class BaseKey(ByteString, collections.Hashable):
         return bytes(self) == bytes(other)
 
     def __repr__(self):
-        return "'{0}'".format(self._to_hex())
+        return "'{0}'".format(self.to_hex())
 
     def __index__(self):
         return self.__int__()
 
     def __hex__(self):
         if sys.version_info.major == 2:
-            return codecs.encode(self._to_hex(), 'ascii')
+            return codecs.encode(self.to_hex(), 'ascii')
         else:
-            return self._to_hex()
+            return self.to_hex()
 
 
 class PublicKey(BaseKey, BackendProxied):
@@ -252,8 +255,11 @@ class Signature(ByteString, BackendProxied):
     def vrs(self):
         return (self.v, self.r, self.s)
 
-    def _to_hex(self):
+    def to_hex(self):
         return '0x' + codecs.decode(codecs.encode(bytes(self), 'hex'), 'ascii')
+
+    def to_bytes(self):
+        return self.__bytes__(self)
 
     def __hash__(self):
         return big_endian_to_int(keccak(bytes(self)))
@@ -268,7 +274,7 @@ class Signature(ByteString, BackendProxied):
         if sys.version_info.major == 2:
             return self.__bytes__()
         else:
-            return self._to_hex()
+            return self.to_hex()
 
     def __unicode__(self):
         return self.__str__()
@@ -280,7 +286,7 @@ class Signature(ByteString, BackendProxied):
         return bytes(self)[index]
 
     def __repr__(self):
-        return "'{0}'".format(self._to_hex())
+        return "'{0}'".format(self.to_hex())
 
     def verify_msg(self, message, public_key):
         message_hash = keccak(message)
@@ -301,9 +307,9 @@ class Signature(ByteString, BackendProxied):
 
     def __hex__(self):
         if sys.version_info.major == 2:
-            return codecs.encode(self._to_hex(), 'ascii')
+            return codecs.encode(self.to_hex(), 'ascii')
         else:
-            return self._to_hex()
+            return self.to_hex()
 
     def __int__(self):
         return big_endian_to_int(bytes(self))

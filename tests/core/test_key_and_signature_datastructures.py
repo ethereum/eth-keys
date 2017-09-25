@@ -115,3 +115,20 @@ def test_hex_conversion(private_key):
     assert hex(public_key) == encode_hex(bytes(public_key))
     assert hex(private_key) == encode_hex(bytes(private_key))
     assert hex(signature) == encode_hex(bytes(signature))
+
+    assert public_key.to_hex() == encode_hex(bytes(public_key))
+    assert private_key.to_hex() == encode_hex(bytes(private_key))
+    assert signature.to_hex() == encode_hex(bytes(signature))
+
+
+def test_bytes_conversion(private_key)
+    public_key = private_key.public_key
+    signature = private_key.sign(b'message')
+
+    assert bytes(public_key) == public_key._raw_key
+    assert bytes(private_key) == private_key._raw_key
+    assert bytes(signature) == signature.__bytes__()
+
+    assert public_key.to_bytes() == public_key._raw_key
+    assert private_key.to_bytes() == private_key._raw_key
+    assert signature.to_bytes() == signature.__bytes__()
