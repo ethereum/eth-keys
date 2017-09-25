@@ -121,7 +121,7 @@ def test_hex_conversion(private_key):
     assert signature.to_hex() == encode_hex(bytes(signature))
 
 
-def test_bytes_conversion(private_key)
+def test_bytes_conversion(private_key):
     public_key = private_key.public_key
     signature = private_key.sign(b'message')
 
