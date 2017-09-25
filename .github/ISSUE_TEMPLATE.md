@@ -9,7 +9,6 @@ Please include any of the following that are applicable:
 
 * The code which produced the error
 * The full output of the error
-* What type of node you were connecting to.
 
 
 ### How can it be fixed?
