@@ -11,6 +11,9 @@ from eth_utils import (
     keccak,
 )
 
+from eth_keys.exceptions import (
+    BadSignature,
+)
 from eth_keys.utils.padding import (
     pad32,
 )
@@ -28,6 +31,7 @@ private_key_st = st.integers(min_value=1, max_value=SECPK1_N).map(
 
 
 message_hash_st = st.binary(min_size=32, max_size=32)
+signature_st = st.binary(min_size=65, max_size=65)
 
 
 MSG = b'message'
@@ -46,38 +50,109 @@ def coincurve_backend():
     return CoinCurveECCBackend()
 
 
-@given(private_key_bytes=private_key_st)
+@given(
+    private_key_bytes=private_key_st,
+    direction=st.one_of(
+        st.just('coincurve-to-native'),
+        st.just('native-to-coincurve'),
+    ),
+)
 @settings(max_examples=MAX_EXAMPLES)
 def test_public_key_generation_is_equal(private_key_bytes,
+                                        direction,
                                         native_backend,
                                         coincurve_backend):
-    native_public_key = native_backend.PrivateKey(private_key_bytes).public_key
-    coincurve_public_key = coincurve_backend.PrivateKey(private_key_bytes).public_key
+    if direction == 'coincurve-to-native':
+        backend_a = coincurve_backend
+        backend_b = native_backend
+    elif direction == 'native-to-coincurve':
+        backend_b = coincurve_backend
+        backend_a = native_backend
+    else:
+        assert False, "invariant"
 
-    assert native_public_key == coincurve_public_key
+    public_key_a = backend_a.PrivateKey(private_key_bytes).public_key
+    public_key_b = backend_b.PrivateKey(private_key_bytes).public_key
+
+    assert public_key_a == public_key_b
 
 
-@given(private_key_bytes=private_key_st, message_hash=message_hash_st)
+@given(
+    private_key_bytes=private_key_st,
+    message_hash=message_hash_st,
+    direction=st.one_of(
+        st.just('coincurve-to-native'),
+        st.just('native-to-coincurve'),
+    ),
+)
 @settings(max_examples=MAX_EXAMPLES)
 def test_native_to_coincurve_recover(private_key_bytes,
                                      message_hash,
+                                     direction,
                                      native_backend,
                                      coincurve_backend):
-    native_pk = native_backend.PrivateKey(private_key_bytes)
-    native_signature = native_backend.ecdsa_sign(message_hash, native_pk)
+    if direction == 'coincurve-to-native':
+        backend_a = coincurve_backend
+        backend_b = native_backend
+    elif direction == 'native-to-coincurve':
+        backend_b = coincurve_backend
+        backend_a = native_backend
+    else:
+        assert False, "invariant"
 
-    recovered_public_key = coincurve_backend.ecdsa_recover(message_hash, native_signature)
-    assert recovered_public_key == native_pk.public_key
+    pk_a = backend_a.PrivateKey(private_key_bytes)
+    signature_a = backend_a.ecdsa_sign(message_hash, pk_a)
+
+    public_key_b = backend_b.ecdsa_recover(message_hash, signature_a)
+    assert public_key_b == pk_a.public_key
 
 
-@given(private_key_bytes=private_key_st, message_hash=message_hash_st)
+@given(
+    message_hash=message_hash_st,
+    signature_bytes=signature_st,
+    direction=st.one_of(
+        st.just('coincurve-to-native'),
+        st.just('native-to-coincurve'),
+    ),
+)
 @settings(max_examples=MAX_EXAMPLES)
-def test_coincurve_to_native_recover(private_key_bytes,
-                                     message_hash,
-                                     native_backend,
-                                     coincurve_backend):
-    coincurve_pk = coincurve_backend.PrivateKey(private_key_bytes)
-    coincurve_signature = coincurve_backend.ecdsa_sign(message_hash, coincurve_pk)
+def test_coincurve_to_native_invalid_signatures(message_hash,
+                                                signature_bytes,
+                                                direction,
+                                                native_backend,
+                                                coincurve_backend):
+    if direction == 'coincurve-to-native':
+        backend_a = coincurve_backend
+        backend_b = native_backend
+    elif direction == 'native-to-coincurve':
+        backend_b = coincurve_backend
+        backend_a = native_backend
+    else:
+        assert False, "invariant"
 
-    recovered_public_key = native_backend.ecdsa_recover(message_hash, coincurve_signature)
-    assert recovered_public_key == coincurve_pk.public_key
+    try:
+        signature_a = backend_a.Signature(signature_bytes)
+    except BadSignature:
+        is_bad_signature = True
+    else:
+        is_bad_signature = False
+
+    if is_bad_signature:
+        with pytest.raises(BadSignature):
+            backend_b.Signature(signature_bytes)
+        return
+    try:
+        public_key_a = backend_a.ecdsa_recover(message_hash, signature_a)
+    except BadSignature:
+        is_bad_recovery = True
+    else:
+        is_bad_recovery = False
+
+    if is_bad_recovery:
+        with pytest.raises(BadSignature):
+            backend_b.ecdsa_recover(message_hash, signature_a)
+        return
+
+    public_key_b = backend_b.ecdsa_recover(message_hash, signature_a)
+
+    assert public_key_b == public_key_a
