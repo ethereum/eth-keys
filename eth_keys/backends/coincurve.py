@@ -7,6 +7,15 @@ from eth_keys.exceptions import (
 from .base import BaseECCBackend
 
 
+def is_coincurve_available():
+    try:
+        import coincurve
+    except ImportError:
+        return False
+    else:
+        return True
+
+
 class CoinCurveECCBackend(BaseECCBackend):
     def __init__(self):
         try:

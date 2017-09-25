@@ -7,18 +7,25 @@ from eth_keys.utils.module_loading import (
 )
 
 from .base import BaseECCBackend  # noqa: F401
-from .coincurve import CoinCurveECCBackend  # noqa: F401
+from .coincurve import (  # noqa: F401
+    CoinCurveECCBackend,
+    is_coincurve_available,
+)
 from .native import NativeECCBackend  # noqa: F401
 
 
-DEFAULT_ECC_BACKEND = 'eth_keys.backends.native.NativeECCBackend'
+def get_default_backend_class():
+    if is_coincurve_available():
+        return 'eth_keys.backends.CoinCurveECCBackend'
+    else:
+        return 'eth_keys.backends.NativeECCBackend'
 
 
 def get_backend_class(import_path=None):
     if import_path is None:
         import_path = os.environ.get(
             'ECC_BACKEND_CLASS',
-            DEFAULT_ECC_BACKEND,
+            get_default_backend_class(),
         )
     return import_string(import_path)
 
