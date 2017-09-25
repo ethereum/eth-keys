@@ -77,7 +77,7 @@ class BaseKey(ByteString, collections.Hashable):
         return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
 
     def to_bytes(self):
-        return self.__bytes__(self)
+        return self.__bytes__()
 
     def __bytes__(self):
         return self._raw_key
@@ -259,7 +259,7 @@ class Signature(ByteString, BackendProxied):
         return '0x' + codecs.decode(codecs.encode(bytes(self), 'hex'), 'ascii')
 
     def to_bytes(self):
-        return self.__bytes__(self)
+        return self.__bytes__()
 
     def __hash__(self):
         return big_endian_to_int(keccak(bytes(self)))
