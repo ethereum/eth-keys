@@ -36,7 +36,7 @@ def public_key(private_key):
 
 @pytest.fixture
 def signature(private_key):
-    return private_key.sign_hash(MSGHASH)
+    return private_key.sign_msg_hash(MSGHASH)
 
 
 def test_proxied_backend_properties(key_api, ecc_backend):

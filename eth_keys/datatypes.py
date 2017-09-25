@@ -130,12 +130,12 @@ class PublicKey(BaseKey, BackendProxied):
         return cls.get_backend().private_key_to_public_key(private_key)
 
     @classmethod
-    def recover_msg(cls, message, signature):
+    def recover_from_msg(cls, message, signature):
         message_hash = keccak(message)
-        return cls.recover_msg_hash(message_hash, signature)
+        return cls.recover_from_msg_hash(message_hash, signature)
 
     @classmethod
-    def recover_msg_hash(cls, message_hash, signature):
+    def recover_from_msg_hash(cls, message_hash, signature):
         return cls.get_backend().ecdsa_recover(message_hash, signature)
 
     def verify_msg(self, message, signature):
@@ -168,11 +168,11 @@ class PrivateKey(BaseKey, BackendProxied):
 
         self.public_key = self.backend.private_key_to_public_key(self)
 
-    def sign(self, message):
+    def sign_msg(self, message):
         message_hash = keccak(message)
-        return self.sign_hash(message_hash)
+        return self.sign_msg_hash(message_hash)
 
-    def sign_hash(self, message_hash):
+    def sign_msg_hash(self, message_hash):
         return self.backend.ecdsa_sign(message_hash, self)
 
 
@@ -295,11 +295,11 @@ class Signature(ByteString, BackendProxied):
     def verify_msg_hash(self, message_hash, public_key):
         return self.backend.ecdsa_verify(message_hash, self, public_key)
 
-    def recover_msg(self, message):
+    def recover_public_key_from_msg(self, message):
         message_hash = keccak(message)
-        return self.recover_msg_hash(message_hash)
+        return self.recover_public_key_from_msg_hash(message_hash)
 
-    def recover_msg_hash(self, message_hash):
+    def recover_public_key_from_msg_hash(self, message_hash):
         return self.backend.ecdsa_recover(message_hash, self)
 
     def __index__(self):

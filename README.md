@@ -13,10 +13,9 @@ pip install ethereum-keys
 ## QuickStart
 
 ```python
->>> from eth_keys import KeyAPI
->>> keys = KeyAPI()
+>>> from eth_keys import keys
 >>> pk = keys.PrivateKey(b'\x01' * 32)
->>> signature = pk.sign(b'a message')
+>>> signature = pk.sign_msg(b'a message')
 >>> pk
 '0x0101010101010101010101010101010101010101010101010101010101010101'
 >>> pk.public_key
@@ -36,10 +35,17 @@ True
 
 ### `KeyAPI(backend=None)`
 
-The `KeyAPI` object is the primary API for interacting with the `ethereum-keys` libary.  The object takes a single optional argument in it's constructor which designates what backend will be used for eliptical curve cryptography operations.  The built-in backends are:
+The `KeyAPI` object is the primary API for interacting with the `ethereum-keys`
+libary.  The object takes a single optional argument in it's constructor which
+designates what backend will be used for eliptical curve cryptography
+operations.  The built-in backends are:
 
-* `eth_keys.backends.NativeECCBackend` (**default**): A pure python implementation of the ECC operations.
+* `eth_keys.backends.NativeECCBackend` A pure python implementation of the ECC operations.
 * `eth_keys.backends.CoinCurveECCBackend`: Uses the [`coincurve`](https://github.com/ofek/coincurve) library for ECC operations.
+
+By default, `ethereum-keys` will *try* to use the `CoinCurveECCBackend`,
+falling back to the `NativeECCBackend` if the `coincurve` library is not
+available.
 
 > Note: The `coincurve` library is not automatically installed with `ethereum-keys` and must be installed separately.
 
@@ -59,6 +65,16 @@ The `backend` argument can be given in any of the following forms.
 # Or for the coincurve base backend
 >>> keys = KeyAPI('eth_keys.backends.CoinCurveECCBackend')
 ```
+
+The backend can also be configured using the environment variable
+`ECC_BACKEND_CLASS` which should be set to the dot-separated python import path
+to the desired backend.
+
+```python
+>>> import os
+>>> os.environ['ECC_BACKEND_CLASS'] = 'eth_keys.backends.CoinCurveECCBackend'
+```
+
 
 ### `KeyAPI.ecdsa_sign(message_hash, private_key) -> Signature`
 
@@ -129,7 +145,7 @@ given `private_key`.
 * `private_key` may either be a byte string of length 32 or an instance of the `KeyAPI.PrivateKey` class.
 
 
-#### `PublicKey.recover_msg(message, signature) -> PublicKey`
+#### `PublicKey.recover_from_msg(message, signature) -> PublicKey`
 
 This `classmethod` returns a new `PublicKey` instance computed from the
 provided `message` and `signature`.
@@ -138,9 +154,9 @@ provided `message` and `signature`.
 * `signature` **must** be an instance of `KeyAPI.Signature`
 
 
-#### `PublicKey.recover_msg_hash(message_hash, signature) -> PublicKey`
+#### `PublicKey.recover_from_msg_hash(message_hash, signature) -> PublicKey`
 
-Same as `PublicKey.recover_msg` except that `message_hash` should be the Keccak
+Same as `PublicKey.recover_from_msg` except that `message_hash` should be the Keccak
 hash of the `message`.
 
 
@@ -183,7 +199,7 @@ The following methods and properties are available
 This *property* holds the `PublicKey` instance coresponding to this private key.
 
 
-#### `PrivateKey.sign(message) -> Signature`
+#### `PrivateKey.sign_msg(message) -> Signature`
 
 This method returns a signature for the given `message` in the form of a
 `Signature` instance
@@ -191,7 +207,7 @@ This method returns a signature for the given `message` in the form of a
 * `message` **must** be a byte string.
 
 
-#### `PrivateKey.sign_hash(message_hash) -> Signature`
+#### `PrivateKey.sign_msg_hash(message_hash) -> Signature`
 
 Same as `PrivateKey.sign` except that `message_hash` should be the Keccak
 hash of the `message`.
@@ -244,17 +260,17 @@ Same as `Signature.verify_msg` except that `message_hash` should be the Keccak
 hash of the `message`.
 
 
-#### `Signature.recover_msg(message) -> PublicKey`
+#### `Signature.recover_public_key_from_msg(message) -> PublicKey`
 
 This method returns a `PublicKey` instance recovered from the signature.
 
 * `message`: **must** be a byte string.
 
 
-#### `Signature.recover_msg_hash(message_hash) -> PublicKey`
+#### `Signature.recover_public_key_from_msg_hash(message_hash) -> PublicKey`
 
-Same as `Signature.recover_msg` except that `message_hash` should be the Keccak
-hash of the `message`.
+Same as `Signature.recover_public_key_from_msg` except that `message_hash`
+should be the Keccak hash of the `message`.
 
 
 ### Exceptions

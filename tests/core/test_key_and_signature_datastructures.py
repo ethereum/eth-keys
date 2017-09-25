@@ -36,22 +36,22 @@ def private_key(ecc_backend):
 
 
 def test_signing_from_private_key_obj(ecc_backend, private_key):
-    signature = private_key.sign(MSG)
+    signature = private_key.sign_msg(MSG)
 
     assert ecc_backend.ecdsa_verify(MSGHASH, signature, private_key.public_key)
 
 
 def test_hash_signing_from_private_key_obj(ecc_backend, private_key):
-    signature = private_key.sign_hash(MSGHASH)
+    signature = private_key.sign_msg_hash(MSGHASH)
 
     assert ecc_backend.ecdsa_verify(MSGHASH, signature, private_key.public_key)
 
 
 def test_recover_from_public_key_class(ecc_backend, private_key):
     signature = ecc_backend.ecdsa_sign(MSGHASH, private_key)
-    public_key = ecc_backend.PublicKey.recover_msg_hash(MSGHASH, signature)
+    public_key = ecc_backend.PublicKey.recover_from_msg_hash(MSGHASH, signature)
 
-    assert public_key == ecc_backend.PublicKey.recover_msg(MSG, signature)
+    assert public_key == ecc_backend.PublicKey.recover_from_msg(MSG, signature)
     assert public_key == private_key.public_key
 
 
@@ -84,9 +84,9 @@ def test_verify_from_signature_obj(ecc_backend, private_key):
 
 def test_recover_from_signature_obj(ecc_backend, private_key):
     signature = ecc_backend.ecdsa_sign(MSGHASH, private_key)
-    public_key = signature.recover_msg_hash(MSGHASH)
+    public_key = signature.recover_public_key_from_msg_hash(MSGHASH)
 
-    assert public_key == signature.recover_msg(MSG)
+    assert public_key == signature.recover_public_key_from_msg(MSG)
     assert public_key == private_key.public_key
 
 
@@ -110,7 +110,7 @@ def test_to_canonical_address_from_public_key(private_key):
 
 def test_hex_conversion(private_key):
     public_key = private_key.public_key
-    signature = private_key.sign(b'message')
+    signature = private_key.sign_msg(b'message')
 
     assert hex(public_key) == encode_hex(bytes(public_key))
     assert hex(private_key) == encode_hex(bytes(private_key))
@@ -123,7 +123,7 @@ def test_hex_conversion(private_key):
 
 def test_bytes_conversion(private_key):
     public_key = private_key.public_key
-    signature = private_key.sign(b'message')
+    signature = private_key.sign_msg(b'message')
 
     assert bytes(public_key) == public_key._raw_key
     assert bytes(private_key) == private_key._raw_key

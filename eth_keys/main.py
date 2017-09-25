@@ -32,7 +32,7 @@ class KeyAPI(object):
 
     def __init__(self, backend=None):
         if backend is None:
-            backend = get_backend()
+            pass
         elif isinstance(backend, BaseECCBackend):
             pass
         elif isinstance(backend, type) and issubclass(backend, BaseECCBackend):
@@ -47,6 +47,19 @@ class KeyAPI(object):
             )
 
         self.backend = backend
+
+    _backend = None
+
+    @property
+    def backend(self):
+        if self._backend is None:
+            return get_backend()
+        else:
+            return self._backend
+
+    @backend.setter
+    def backend(self, value):
+        self._backend = value
 
     #
     # Proxy method calls to the backends
@@ -102,3 +115,8 @@ class KeyAPI(object):
                 "an instance of `eth_keys.datatypes.PublicKey`"
             )
         return public_key
+
+
+# This creates an easy to import backend which will lazily fetch whatever
+# backend has been configured at runtime (as opposed to import or instantiation time).
+lazy_key_api = KeyAPI(backend=None)
