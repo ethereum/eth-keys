@@ -124,8 +124,6 @@ Each of these objects has all of the following APIs.
 
 * `obj.to_bytes()`: Returns the object in it's canonical `bytes` serialization.
 * `obj.to_hex()`: Returns a text string of the hex encoded canonical representation.
-* `bytes(obj)`: Same as `obj.to_bytes()`
-* `hex(obj)`: Same as `obj.to_hex()`
 
 
 ### `KeyAPI.PublicKey(public_key_bytes)`
@@ -221,6 +219,8 @@ The `Signature` class can be instantiated in one of two ways.
 * `vrs`: a 3-tuple composed of the integers `v`, `r`, and `s`.
 
 > Note: If using the `signature_bytes` to instantiate, the byte string should be encoded as `r_bytes | s_bytes | v_bytes` where `|` represents concatenation.  `r_bytes` and `s_bytes` should be 32 bytes in length.  `v_bytes` should be a single byte `\x00` or `\x01`.
+
+Signatures are expected to use `1` or `0` for their `v` value.
 
 The following methods and properties are available
 
