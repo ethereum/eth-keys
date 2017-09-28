@@ -28,7 +28,7 @@ class CoinCurveECCBackend(BaseECCBackend):
         super(CoinCurveECCBackend, self).__init__()
 
     def ecdsa_sign(self, msg_hash, private_key):
-        private_key_bytes = bytes(private_key)
+        private_key_bytes = private_key.to_bytes()
         signature_bytes = self.keys.PrivateKey(private_key_bytes).sign_recoverable(
             msg_hash,
             hasher=None,
@@ -37,7 +37,7 @@ class CoinCurveECCBackend(BaseECCBackend):
         return signature
 
     def ecdsa_recover(self, msg_hash, signature):
-        signature_bytes = bytes(signature)
+        signature_bytes = signature.to_bytes()
         try:
             public_key_bytes = self.keys.PublicKey.from_signature_and_message(
                 signature_bytes,
@@ -52,7 +52,7 @@ class CoinCurveECCBackend(BaseECCBackend):
         return public_key
 
     def private_key_to_public_key(self, private_key):
-        public_key_bytes = self.keys.PrivateKey(bytes(private_key)).public_key.format(
+        public_key_bytes = self.keys.PrivateKey(private_key.to_bytes()).public_key.format(
             compressed=False,
         )[1:]
         return self.PublicKey(public_key_bytes)

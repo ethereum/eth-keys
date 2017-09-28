@@ -69,12 +69,6 @@ def test_from_private_for_public_key_class(ecc_backend, private_key):
     assert public_key == private_key.public_key
 
 
-def test_from_private_bytes_for_public_key_class(ecc_backend, private_key):
-    public_key = ecc_backend.PublicKey.from_private(bytes(private_key))
-
-    assert public_key == private_key.public_key
-
-
 def test_verify_from_signature_obj(ecc_backend, private_key):
     signature = ecc_backend.ecdsa_sign(MSGHASH, private_key)
 
@@ -112,23 +106,19 @@ def test_hex_conversion(private_key):
     public_key = private_key.public_key
     signature = private_key.sign_msg(b'message')
 
-    assert hex(public_key) == encode_hex(bytes(public_key))
-    assert hex(private_key) == encode_hex(bytes(private_key))
-    assert hex(signature) == encode_hex(bytes(signature))
+    assert hex(public_key) == encode_hex(public_key.to_bytes())
+    assert hex(private_key) == encode_hex(private_key.to_bytes())
+    assert hex(signature) == encode_hex(signature.to_bytes())
 
-    assert public_key.to_hex() == encode_hex(bytes(public_key))
-    assert private_key.to_hex() == encode_hex(bytes(private_key))
-    assert signature.to_hex() == encode_hex(bytes(signature))
+    assert public_key.to_hex() == encode_hex(public_key.to_bytes())
+    assert private_key.to_hex() == encode_hex(private_key.to_bytes())
+    assert signature.to_hex() == encode_hex(signature.to_bytes())
 
 
-def test_bytes_conversion(private_key):
+def test_bytes_conversion(ecc_backend, private_key):
     public_key = private_key.public_key
     signature = private_key.sign_msg(b'message')
 
-    assert bytes(public_key) == public_key._raw_key
-    assert bytes(private_key) == private_key._raw_key
-    assert bytes(signature) == signature.__bytes__()
-
     assert public_key.to_bytes() == public_key._raw_key
     assert private_key.to_bytes() == private_key._raw_key
-    assert signature.to_bytes() == signature.__bytes__()
+    assert signature.to_bytes() == ecc_backend.Signature(signature.to_bytes()).to_bytes()

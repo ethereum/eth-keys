@@ -8,6 +8,7 @@ import sys
 from eth_utils import (
     big_endian_to_int,
     int_to_big_endian,
+    is_bytes,
     keccak,
     to_checksum_address,
     to_normalized_address,
@@ -24,17 +25,17 @@ from eth_keys.utils.padding import (
 )
 
 from eth_keys.exceptions import (
-    ValidationError,
     BadSignature,
+    ValidationError,
 )
 from eth_keys.validation import (
+    validate_gte,
+    validate_integer,
     validate_lt_secpk1n,
     validate_lte,
-    validate_gte,
-    validate_public_key_bytes,
     validate_private_key_bytes,
+    validate_public_key_bytes,
     validate_signature_bytes,
-    validate_integer,
 )
 
 
@@ -77,19 +78,13 @@ class BaseKey(ByteString, collections.Hashable):
         return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
 
     def to_bytes(self):
-        return self.__bytes__()
-
-    def __bytes__(self):
         return self._raw_key
 
     def __hash__(self):
-        return big_endian_to_int(keccak(bytes(self)))
+        return big_endian_to_int(keccak(self.to_bytes()))
 
     def __str__(self):
-        if sys.version_info.major == 2:
-            return self.__bytes__()
-        else:
-            return self.to_hex()
+        return self.to_hex()
 
     def __unicode__(self):
         return self.__str__()
@@ -104,7 +99,12 @@ class BaseKey(ByteString, collections.Hashable):
         return self._raw_key[index]
 
     def __eq__(self, other):
-        return bytes(self) == bytes(other)
+        if hasattr(other, 'to_bytes'):
+            return self.to_bytes() == other.to_bytes()
+        elif is_bytes(other):
+            return self.to_bytes() == other
+        else:
+            return False
 
     def __repr__(self):
         return "'{0}'".format(self.to_hex())
@@ -149,13 +149,13 @@ class PublicKey(BaseKey, BackendProxied):
     # Ethereum address conversions
     #
     def to_checksum_address(self):
-        return to_checksum_address(public_key_bytes_to_address(bytes(self)))
+        return to_checksum_address(public_key_bytes_to_address(self.to_bytes()))
 
     def to_address(self):
-        return to_normalized_address(public_key_bytes_to_address(bytes(self)))
+        return to_normalized_address(public_key_bytes_to_address(self.to_bytes()))
 
     def to_canonical_address(self):
-        return public_key_bytes_to_address(bytes(self))
+        return public_key_bytes_to_address(self.to_bytes())
 
 
 class PrivateKey(BaseKey, BackendProxied):
@@ -214,10 +214,8 @@ class Signature(ByteString, BackendProxied):
     @v.setter
     def v(self, value):
         validate_integer(value)
-        if value in {0, 1}:
-            value += 27
-        validate_gte(value, minimum=27)
-        validate_lte(value, maximum=28)
+        validate_gte(value, minimum=0)
+        validate_lte(value, maximum=1)
 
         self._v = value
 
@@ -256,16 +254,16 @@ class Signature(ByteString, BackendProxied):
         return (self.v, self.r, self.s)
 
     def to_hex(self):
-        return '0x' + codecs.decode(codecs.encode(bytes(self), 'hex'), 'ascii')
+        return '0x' + codecs.decode(codecs.encode(self.to_bytes(), 'hex'), 'ascii')
 
     def to_bytes(self):
         return self.__bytes__()
 
     def __hash__(self):
-        return big_endian_to_int(keccak(bytes(self)))
+        return big_endian_to_int(keccak(self.to_bytes()))
 
     def __bytes__(self):
-        vb = int_to_byte(self.v - 27)
+        vb = int_to_byte(self.v)
         rb = pad32(int_to_big_endian(self.r))
         sb = pad32(int_to_big_endian(self.s))
         return b''.join((rb, sb, vb))
@@ -282,8 +280,16 @@ class Signature(ByteString, BackendProxied):
     def __len__(self):
         return 65
 
+    def __eq__(self, other):
+        if hasattr(other, 'to_bytes'):
+            return self.to_bytes() == other.to_bytes()
+        elif is_bytes(other):
+            return self.to_bytes() == other
+        else:
+            return False
+
     def __getitem__(self, index):
-        return bytes(self)[index]
+        return self.to_bytes()[index]
 
     def __repr__(self):
         return "'{0}'".format(self.to_hex())
@@ -312,4 +318,4 @@ class Signature(ByteString, BackendProxied):
             return self.to_hex()
 
     def __int__(self):
-        return big_endian_to_int(bytes(self))
+        return big_endian_to_int(self.to_bytes())

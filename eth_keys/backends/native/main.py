@@ -11,7 +11,7 @@ from eth_keys.backends.base import BaseECCBackend
 
 class NativeECCBackend(BaseECCBackend):
     def ecdsa_sign(self, msg_hash, private_key):
-        signature_vrs = ecdsa_raw_sign(msg_hash, bytes(private_key))
+        signature_vrs = ecdsa_raw_sign(msg_hash, private_key.to_bytes())
         signature = self.Signature(vrs=signature_vrs)
         return signature
 
@@ -21,6 +21,6 @@ class NativeECCBackend(BaseECCBackend):
         return public_key
 
     def private_key_to_public_key(self, private_key):
-        public_key_bytes = private_key_to_public_key(bytes(private_key))
+        public_key_bytes = private_key_to_public_key(private_key.to_bytes())
         public_key = self.PublicKey(public_key_bytes)
         return public_key

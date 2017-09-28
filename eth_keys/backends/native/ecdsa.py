@@ -22,9 +22,6 @@ from eth_keys.exceptions import (
     BadSignature,
 )
 
-from eth_keys.utils.numeric import (
-    int_to_byte,
-)
 from eth_keys.utils.padding import pad32
 
 from .jacobian import (
@@ -62,21 +59,6 @@ def private_key_to_public_key(private_key_bytes):
     return public_key_bytes
 
 
-def encode_signature(v, r, s):
-    vb = int_to_byte(v - 27)
-    rb = pad32(int_to_big_endian(r))
-    sb = pad32(int_to_big_endian(s))
-
-    return b''.join((rb, sb, vb))
-
-
-def decode_signature(signature_bytes):
-    r = big_endian_to_int(signature_bytes[0:32])
-    s = big_endian_to_int(signature_bytes[32:64])
-    v = signature_bytes[64] + 27
-    return v, r, s
-
-
 def deterministic_generate_k(msg_hash, private_key_bytes, digest_fn=hashlib.sha256):
     v_0 = b'\x01' * 32
     k_0 = b'\x00' * 32
@@ -101,13 +83,14 @@ def ecdsa_raw_sign(msg_hash, private_key_bytes):
     v = 27 + ((y % 2) ^ (0 if s_raw * 2 < N else 1))
     s = s_raw if s_raw * 2 < N else N - s_raw
 
-    return v, r, s
+    return v - 27, r, s
 
 
 def ecdsa_raw_verify(msg_hash, vrs, public_key_bytes):
     raw_public_key = decode_public_key(public_key_bytes)
 
     v, r, s = vrs
+    v += 27
     if not (27 <= v <= 34):
         raise BadSignature("Invalid Signature")
 
@@ -124,6 +107,7 @@ def ecdsa_raw_verify(msg_hash, vrs, public_key_bytes):
 
 def ecdsa_raw_recover(msg_hash, vrs):
     v, r, s = vrs
+    v += 27
 
     if not (27 <= v <= 34):
         raise BadSignature("%d must in range 27-31" % v)
