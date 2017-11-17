@@ -3,6 +3,7 @@ from importlib import import_module
 
 
 def import_string(dotted_path):
+    # type: (str) -> type
     """
     Source: django.utils.module_loading
     Import a dotted module path and return the attribute/class designated by the

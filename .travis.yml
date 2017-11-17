@@ -15,6 +15,9 @@ matrix:
   # lint
   - python: "3.5"
     env: TOX_ENV=flake8
+  # mypy
+  - python: "3.5"
+    env: TOX_ENV=mypy
   # core
   - python: "2.7"
     env: TOX_ENV=py27-core

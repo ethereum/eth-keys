@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import os
+from typing import Optional  # noqa: F401
 
 from eth_keys.utils.module_loading import (
     import_string,
@@ -15,6 +16,7 @@ from .native import NativeECCBackend  # noqa: F401
 
 
 def get_default_backend_class():
+    # type: () -> str
     if is_coincurve_available():
         return 'eth_keys.backends.CoinCurveECCBackend'
     else:
@@ -22,6 +24,7 @@ def get_default_backend_class():
 
 
 def get_backend_class(import_path=None):
+    # type: (Optional[str]) -> type
     if import_path is None:
         import_path = os.environ.get(
             'ECC_BACKEND_CLASS',
@@ -31,5 +34,6 @@ def get_backend_class(import_path=None):
 
 
 def get_backend(import_path=None):
+    # type: (Optional[str]) -> BaseECCBackend
     backend_class = get_backend_class(import_path)
     return backend_class()
