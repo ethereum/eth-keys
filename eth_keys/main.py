@@ -1,3 +1,5 @@
+from typing import (Any, Optional, Union)  # noqa: F401
+
 from eth_utils import (
     is_string,
 )
@@ -64,11 +66,17 @@ class KeyAPI(object):
     #
     # Proxy method calls to the backends
     #
-    PublicKey = backend_property_proxy('PublicKey')  # noqa: F811
-    PrivateKey = backend_property_proxy('PrivateKey')  # noqa: F811
-    Signature = backend_property_proxy('Signature')  # noqa: F811
+    # Mypy cannot detect the type of dynamically computed classes
+    # (https://github.com/python/mypy/issues/2477), so we must annotate those with Any
+    PublicKey = backend_property_proxy('PublicKey')  # type: Any
+    PrivateKey = backend_property_proxy('PrivateKey')  # type: Any
+    Signature = backend_property_proxy('Signature')  # type: Any
 
-    def ecdsa_sign(self, message_hash, private_key):
+    def ecdsa_sign(self,
+                   message_hash,  # type: str
+                   private_key  # type: Union[PrivateKey, str]
+                   ):
+        # type: (...) -> Optional[Signature]
         validate_message_hash(message_hash)
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
@@ -82,14 +90,23 @@ class KeyAPI(object):
             )
         return signature
 
-    def ecdsa_verify(self, message_hash, signature, public_key):
+    def ecdsa_verify(self,
+                     message_hash,  # type: str
+                     signature,  # type: Union[Signature, str]
+                     public_key  # type: Union[PublicKey, str]
+                     ):
+        # type: (...) -> Optional[bool]
         if not isinstance(public_key, PublicKey):
             raise ValidationError(
                 "The `public_key` must be an instance of `eth_keys.datatypes.PublicKey`"
             )
         return self.ecdsa_recover(message_hash, signature) == public_key
 
-    def ecdsa_recover(self, message_hash, signature):
+    def ecdsa_recover(self,
+                      message_hash,  # type: str
+                      signature  # type: Union[Signature, str]
+                      ):
+        # type: (...) -> Optional[PublicKey]
         validate_message_hash(message_hash)
         if not isinstance(signature, Signature):
             raise ValidationError(

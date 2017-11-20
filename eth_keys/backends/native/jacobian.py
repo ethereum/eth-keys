@@ -1,3 +1,5 @@
+from typing import Tuple  # noqa: F401
+
 from eth_keys.constants import (
     SECPK1_P as P,
     SECPK1_N as N,
@@ -6,6 +8,7 @@ from eth_keys.constants import (
 
 
 def inv(a, n):
+    # type: (int, int) -> int
     if a == 0:
         return 0
     lm, hm = 1, 0
@@ -18,11 +21,13 @@ def inv(a, n):
 
 
 def to_jacobian(p):
+    # type: (Tuple[int, int]) -> Tuple[int, int, int]
     o = (p[0], p[1], 1)
     return o
 
 
 def jacobian_double(p):
+    # type: (Tuple[int, int, int]) -> Tuple[int, int, int]
     if not p[1]:
         return (0, 0, 0)
     ysq = (p[1] ** 2) % P
@@ -34,7 +39,10 @@ def jacobian_double(p):
     return (nx, ny, nz)
 
 
-def jacobian_add(p, q):
+def jacobian_add(p,  # type: Tuple[int, int, int]
+                 q  # type: Tuple[int, int, int]
+                 ):
+    # type: (...) -> Tuple[int, int, int]
     if not p[1]:
         return q
     if not q[1]:
@@ -59,11 +67,13 @@ def jacobian_add(p, q):
 
 
 def from_jacobian(p):
+    # type: (Tuple[int, int, int]) -> Tuple[int, int]
     z = inv(p[2], P)
     return ((p[0] * z**2) % P, (p[1] * z**3) % P)
 
 
 def jacobian_multiply(a, n):
+    # type: (Tuple[int, int, int], int) -> Tuple[int, int, int]
     if a[1] == 0 or n == 0:
         return (0, 0, 1)
     if n == 1:
@@ -72,11 +82,14 @@ def jacobian_multiply(a, n):
         return jacobian_multiply(a, n % N)
     if (n % 2) == 0:
         return jacobian_double(jacobian_multiply(a, n // 2))
-    if (n % 2) == 1:
+    elif (n % 2) == 1:
         return jacobian_add(jacobian_double(jacobian_multiply(a, n // 2)), a)
+    else:
+        raise Exception("Invariant: Unreachable code path")
 
 
 def fast_multiply(a, n):
+    # type: (Tuple[int, int], int) -> Tuple[int, int]
     return from_jacobian(jacobian_multiply(to_jacobian(a), n))
 
 
