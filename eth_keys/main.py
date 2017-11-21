@@ -73,8 +73,8 @@ class KeyAPI(object):
     Signature = backend_property_proxy('Signature')  # type: Any
 
     def ecdsa_sign(self,
-                   message_hash,  # type: str
-                   private_key  # type: Union[PrivateKey, str]
+                   message_hash,  # type: bytes
+                   private_key  # type: Union[PrivateKey, bytes]
                    ):
         # type: (...) -> Optional[Signature]
         validate_message_hash(message_hash)
@@ -91,9 +91,9 @@ class KeyAPI(object):
         return signature
 
     def ecdsa_verify(self,
-                     message_hash,  # type: str
-                     signature,  # type: Union[Signature, str]
-                     public_key  # type: Union[PublicKey, str]
+                     message_hash,  # type: bytes
+                     signature,  # type: Union[Signature, bytes]
+                     public_key  # type: Union[PublicKey, bytes]
                      ):
         # type: (...) -> Optional[bool]
         if not isinstance(public_key, PublicKey):
@@ -103,8 +103,8 @@ class KeyAPI(object):
         return self.ecdsa_recover(message_hash, signature) == public_key
 
     def ecdsa_recover(self,
-                      message_hash,  # type: str
-                      signature  # type: Union[Signature, str]
+                      message_hash,  # type: bytes
+                      signature  # type: Union[Signature, bytes]
                       ):
         # type: (...) -> Optional[PublicKey]
         validate_message_hash(message_hash)

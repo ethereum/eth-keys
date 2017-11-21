@@ -18,13 +18,13 @@ from eth_keys.datatypes import (  # noqa: F401
 
 class NativeECCBackend(BaseECCBackend):
     def ecdsa_sign(self, msg_hash, private_key):
-        # type: (str, PrivateKey) -> Signature
+        # type: (bytes, PrivateKey) -> Signature
         signature_vrs = ecdsa_raw_sign(msg_hash, private_key.to_bytes())
         signature = self.Signature(vrs=signature_vrs)
         return signature
 
     def ecdsa_recover(self,
-                      msg_hash,  # type: str
+                      msg_hash,  # type: bytes
                       signature  # type: Signature
                       ):
         # type: (...) -> Optional[PublicKey]

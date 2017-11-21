@@ -3,7 +3,7 @@ Functions lifted from https://github.com/vbuterin/pybitcointools
 """
 import hashlib
 import hmac
-from typing import (Callable, Optional, Tuple)  # noqa: F401
+from typing import (Any, Callable, Optional, Tuple)  # noqa: F401
 
 from eth_utils import (
     int_to_big_endian,
@@ -42,7 +42,7 @@ def decode_public_key(public_key_bytes):
 
 
 def encode_raw_public_key(raw_public_key):
-    # type: (Tuple[int, int]) -> str
+    # type: (Tuple[int, int]) -> bytes
     left, right = raw_public_key
     return b''.join((
         pad32(int_to_big_endian(left)),
@@ -51,7 +51,7 @@ def encode_raw_public_key(raw_public_key):
 
 
 def private_key_to_public_key(private_key_bytes):
-    # type: (str) -> str
+    # type: (bytes) -> bytes
     private_key_as_num = big_endian_to_int(private_key_bytes)
 
     if private_key_as_num >= N:
@@ -63,7 +63,7 @@ def private_key_to_public_key(private_key_bytes):
 
 
 def deterministic_generate_k(msg_hash, private_key_bytes, digest_fn=hashlib.sha256):
-    # type: (str, str, Callable[[], hashlib._hash]) -> int
+    # type: (bytes, bytes, Callable[[], Any]) -> int
     v_0 = b'\x01' * 32
     k_0 = b'\x00' * 32
 
@@ -78,7 +78,7 @@ def deterministic_generate_k(msg_hash, private_key_bytes, digest_fn=hashlib.sha2
 
 
 def ecdsa_raw_sign(msg_hash, private_key_bytes):
-    # type: (str, str) -> Tuple[int, int, int]
+    # type: (bytes, bytes) -> Tuple[int, int, int]
     z = big_endian_to_int(msg_hash)
     k = deterministic_generate_k(msg_hash, private_key_bytes)
 
@@ -92,6 +92,7 @@ def ecdsa_raw_sign(msg_hash, private_key_bytes):
 
 
 def ecdsa_raw_verify(msg_hash, vrs, public_key_bytes):
+    # type: (bytes, Tuple[int, int, int], bytes) -> Optional[bool]
     raw_public_key = decode_public_key(public_key_bytes)
 
     v, r, s = vrs
@@ -111,7 +112,7 @@ def ecdsa_raw_verify(msg_hash, vrs, public_key_bytes):
 
 
 def ecdsa_raw_recover(msg_hash, vrs):
-    # type: (str, Tuple[int, int, int]) -> Optional[str]
+    # type: (bytes, Tuple[int, int, int]) -> Optional[bytes]
     v, r, s = vrs
     v += 27
 

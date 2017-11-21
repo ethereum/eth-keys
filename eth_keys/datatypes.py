@@ -76,14 +76,16 @@ class BackendProxied(object):
 
 
 class BaseKey(ByteString, collections.Hashable):
-    _raw_key = None  # type: str
+    _raw_key = None  # type: bytes
 
     def to_hex(self):
         # type: () -> Text
-        return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
+        # Need the 'type: ignore' comment below because of
+        # https://github.com/python/typeshed/issues/300
+        return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')  # type: ignore
 
     def to_bytes(self):
-        # type: () -> str
+        # type: () -> bytes
         return self._raw_key
 
     def __hash__(self):
@@ -122,7 +124,7 @@ class BaseKey(ByteString, collections.Hashable):
         return self.__int__()
 
     def __hex__(self):
-        # type: () -> str
+        # type: () -> Text
         if sys.version_info[0] == 2:
             return codecs.encode(self.to_hex(), 'ascii')
         else:
@@ -131,7 +133,7 @@ class BaseKey(ByteString, collections.Hashable):
 
 class PublicKey(BaseKey, BackendProxied):
     def __init__(self, public_key_bytes):
-        # type: (str) -> None
+        # type: (bytes) -> None
         validate_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
@@ -143,37 +145,37 @@ class PublicKey(BaseKey, BackendProxied):
 
     @classmethod
     def recover_from_msg(cls, message, signature):
-        # type: (str, Signature) -> PublicKey
+        # type: (bytes, Signature) -> PublicKey
         message_hash = keccak(message)
         return cls.recover_from_msg_hash(message_hash, signature)
 
     @classmethod
     def recover_from_msg_hash(cls, message_hash, signature):
-        # type: (str, Signature) -> PublicKey
+        # type: (bytes, Signature) -> PublicKey
         return cls.get_backend().ecdsa_recover(message_hash, signature)
 
     def verify_msg(self, message, signature):
-        # type: (str, Signature) -> bool
+        # type: (bytes, Signature) -> bool
         message_hash = keccak(message)
         return self.verify_msg_hash(message_hash, signature)
 
     def verify_msg_hash(self, message_hash, signature):
-        # type: (str, Signature) -> bool
+        # type: (bytes, Signature) -> bool
         return self.backend.ecdsa_verify(message_hash, signature, self)
 
     #
     # Ethereum address conversions
     #
     def to_checksum_address(self):
-        # type: () -> Text
+        # type: () -> bytes
         return to_checksum_address(public_key_bytes_to_address(self.to_bytes()))
 
     def to_address(self):
-        # type: () -> Text
+        # type: () -> bytes
         return to_normalized_address(public_key_bytes_to_address(self.to_bytes()))
 
     def to_canonical_address(self):
-        # type: () -> str
+        # type: () -> bytes
         return public_key_bytes_to_address(self.to_bytes())
 
 
@@ -181,7 +183,7 @@ class PrivateKey(BaseKey, BackendProxied):
     public_key = None
 
     def __init__(self, private_key_bytes):
-        # type: (str) -> None
+        # type: (bytes) -> None
         validate_private_key_bytes(private_key_bytes)
 
         self._raw_key = private_key_bytes
@@ -189,12 +191,12 @@ class PrivateKey(BaseKey, BackendProxied):
         self.public_key = self.backend.private_key_to_public_key(self)
 
     def sign_msg(self, message):
-        # type: (str) -> Signature
+        # type: (bytes) -> Signature
         message_hash = keccak(message)
         return self.sign_msg_hash(message_hash)
 
     def sign_msg_hash(self, message_hash):
-        # type: (str) -> Signature
+        # type: (bytes) -> Signature
         return self.backend.ecdsa_sign(message_hash, self)
 
 
@@ -205,7 +207,7 @@ class Signature(ByteString, BackendProxied):
     _s = None
 
     def __init__(self, signature_bytes=None, vrs=None):
-        # type: (Optional[str], Optional[Tuple[int, int, int]]) -> None
+        # type: (Optional[bytes], Optional[Tuple[int, int, int]]) -> None
         if bool(signature_bytes) is bool(vrs):
             raise TypeError("You must provide one of `signature_bytes` or `vrs`")
         elif signature_bytes:
@@ -285,27 +287,27 @@ class Signature(ByteString, BackendProxied):
 
     def to_hex(self):
         # type: () -> Text
-        return '0x' + codecs.decode(codecs.encode(self.to_bytes(), 'hex'), 'ascii')
+        # Need the 'type: ignore' comment below because of
+        # https://github.com/python/typeshed/issues/300
+        return '0x' + codecs.decode(codecs.encode(self.to_bytes(), 'hex'), 'ascii')  # type: ignore
 
     def to_bytes(self):
-        # type: () -> str
+        # type: () -> bytes
         return self.__bytes__()
 
     def __hash__(self):
         return big_endian_to_int(keccak(self.to_bytes()))
 
     def __bytes__(self):
-        # type: () -> str
+        # type: () -> bytes
         vb = int_to_byte(self.v)
         rb = pad32(int_to_big_endian(self.r))
         sb = pad32(int_to_big_endian(self.s))
-        return b''.join((rb, sb, vb))
+        # FIXME: Enable type checking once we have type annotations in eth_utils
+        return b''.join((rb, sb, vb))  # type: ignore
 
     def __str__(self):
-        if sys.version_info[0] == 2:
-            return self.__bytes__()
-        else:
-            return self.to_hex()
+        return self.to_hex()
 
     def __unicode__(self):
         return self.__str__()
@@ -328,28 +330,28 @@ class Signature(ByteString, BackendProxied):
         return "'{0}'".format(self.to_hex())
 
     def verify_msg(self, message, public_key):
-        # type: (str, PublicKey) -> bool
+        # type: (bytes, PublicKey) -> bool
         message_hash = keccak(message)
         return self.verify_msg_hash(message_hash, public_key)
 
     def verify_msg_hash(self, message_hash, public_key):
-        # type: (str, PublicKey) -> bool
+        # type: (bytes, PublicKey) -> bool
         return self.backend.ecdsa_verify(message_hash, self, public_key)
 
     def recover_public_key_from_msg(self, message):
-        # type: (str) -> PublicKey
+        # type: (bytes) -> PublicKey
         message_hash = keccak(message)
         return self.recover_public_key_from_msg_hash(message_hash)
 
     def recover_public_key_from_msg_hash(self, message_hash):
-        # type: (str) -> PublicKey
+        # type: (bytes) -> PublicKey
         return self.backend.ecdsa_recover(message_hash, self)
 
     def __index__(self):
         return self.__int__()
 
     def __hex__(self):
-        # type: () -> str
+        # type: () -> Text
         if sys.version_info[0] == 2:
             return codecs.encode(self.to_hex(), 'ascii')
         else:

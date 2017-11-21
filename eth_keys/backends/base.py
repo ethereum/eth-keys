@@ -27,7 +27,7 @@ class BaseECCBackend(object):
         raise NotImplementedError()
 
     def ecdsa_verify(self,
-                     msg_hash,  # type: str
+                     msg_hash,   # type: bytes
                      signature,  # type: Signature
                      public_key  # type: PublicKey
                      ):
