@@ -22,7 +22,7 @@ def validate_integer(value):
 
 
 def validate_bytes(value):
-    # type: (str) -> None
+    # type: (bytes) -> None
     if not is_bytes(value):
         raise ValidationError("Value must be a byte string.  Got: {0}".format(type(value)))
 
@@ -55,28 +55,28 @@ validate_lt_secpk1n = validate_lte(maximum=SECPK1_N - 1)
 
 
 def validate_message_hash(value):
-    # type: (str) -> None
+    # type: (bytes) -> None
     validate_bytes(value)
     if len(value) != 32:
         raise ValidationError("Unexpected signature format.  Must be length 65 byte string")
 
 
 def validate_public_key_bytes(value):
-    # type: (str) -> None
+    # type: (bytes) -> None
     validate_bytes(value)
     if len(value) != 64:
         raise ValidationError("Unexpected public key format.  Must be length 64 byte string")
 
 
 def validate_private_key_bytes(value):
-    # type: (str) -> None
+    # type: (bytes) -> None
     validate_bytes(value)
     if len(value) != 32:
         raise ValidationError("Unexpected private key format.  Must be length 32 byte string")
 
 
 def validate_signature_bytes(value):
-    # type: (str) -> None
+    # type: (bytes) -> None
     validate_bytes(value)
     if len(value) != 65:
         raise ValidationError("Unexpected signature format.  Must be length 65 byte string")
