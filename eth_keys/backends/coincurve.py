@@ -37,7 +37,7 @@ class CoinCurveECCBackend(BaseECCBackend):
         super(CoinCurveECCBackend, self).__init__()
 
     def ecdsa_sign(self,
-                   msg_hash,  # type: str
+                   msg_hash,  # type: bytes
                    private_key  # type: PrivateKey
                    ):
         # type: (...) -> Signature
@@ -50,7 +50,7 @@ class CoinCurveECCBackend(BaseECCBackend):
         return signature
 
     def ecdsa_recover(self,
-                      msg_hash,  # type: str
+                      msg_hash,  # type: bytes
                       signature  # type: Signature
                       ):
         # type: (...) -> Optional[PublicKey]
