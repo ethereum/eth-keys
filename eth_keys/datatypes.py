@@ -14,7 +14,6 @@ from eth_utils import (
     to_normalized_address,
 )
 
-from eth_keys.backends.base import BaseECCBackend  # noqa: F401
 from eth_keys.utils.address import (
     public_key_bytes_to_address,
 )
@@ -38,6 +37,13 @@ from eth_keys.validation import (
     validate_public_key_bytes,
     validate_signature_bytes,
 )
+
+
+# Workaround for import cycles caused by type annotations:
+# http://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
+MYPY = False
+if MYPY:
+    from eth_keys.backends.base import BaseECCBackend  # noqa: F401
 
 
 # Must compare against version_info[0] and not version_info.major to please mypy.
@@ -180,7 +186,7 @@ class PublicKey(BaseKey, BackendProxied):
 
 
 class PrivateKey(BaseKey, BackendProxied):
-    public_key = None
+    public_key = None  # type: PublicKey
 
     def __init__(self, private_key_bytes):
         # type: (bytes) -> None
@@ -202,9 +208,9 @@ class PrivateKey(BaseKey, BackendProxied):
 
 class Signature(ByteString, BackendProxied):
     _backend = None
-    _v = None
-    _r = None
-    _s = None
+    _v = None  # type: int
+    _r = None  # type: int
+    _s = None  # type: int
 
     def __init__(self, signature_bytes=None, vrs=None):
         # type: (Optional[bytes], Optional[Tuple[int, int, int]]) -> None
