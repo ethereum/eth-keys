@@ -12,17 +12,18 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 setup(
-    name='ethereum-keys',
+    name='eth-keys',
+    # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
     version='0.1.0-alpha.7',
     description="""Common API for Ethereum key operations.""",
     long_description_markdown_filename='README.md',
     author='Piper Merriam',
     author_email='pipermerriam@gmail.com',
-    url='https://github.com/pipermerriam/ethereum-keys',
+    url='https://github.com/ethereum/eth-keys',
     include_package_data=True,
     setup_requires=['setuptools-markdown'],
     install_requires=[
-        "ethereum-utils>=0.4.0",
+        "eth-utils>=0.5.0",
         "cytoolz>=0.8.2",
     ],
     py_modules=['eth_keys'],
