@@ -3,3 +3,4 @@ tox==2.7.0
 flake8==3.0.4
 hypothesis==3.30.0
 typing==3.6.2
+bumpversion==0.5.3
