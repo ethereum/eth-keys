@@ -1,14 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
-
 from setuptools import (
     setup,
     find_packages,
 )
 
 
-DIR = os.path.dirname(os.path.abspath(__file__))
+install_requires=[
+    "eth-utils>=0.5.0",
+    "cytoolz>=0.8.2",
+]
+
+
+try:
+    import typing
+except ImportError:
+    # python 2 and 3.4 support
+    install_requires.append("typing==3.6.2")
 
 
 setup(
@@ -22,10 +30,7 @@ setup(
     url='https://github.com/ethereum/eth-keys',
     include_package_data=True,
     setup_requires=['setuptools-markdown'],
-    install_requires=[
-        "eth-utils>=0.5.0",
-        "cytoolz>=0.8.2",
-    ],
+    install_requires=install_requires,
     py_modules=['eth_keys'],
     license="MIT",
     zip_safe=False,
