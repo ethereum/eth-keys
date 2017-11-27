@@ -6,19 +6,6 @@ from setuptools import (
 )
 
 
-install_requires=[
-    "eth-utils>=0.5.0",
-    "cytoolz>=0.8.2",
-]
-
-
-try:
-    import typing
-except ImportError:
-    # python 2 and 3.4 support
-    install_requires.append("typing==3.6.2")
-
-
 setup(
     name='eth-keys',
     # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
@@ -30,7 +17,12 @@ setup(
     url='https://github.com/ethereum/eth-keys',
     include_package_data=True,
     setup_requires=['setuptools-markdown'],
-    install_requires=install_requires,
+    install_requires=[
+        "eth-utils>=0.5.0",
+        "cytoolz>=0.8.2",
+        # can be removed when py27/34 are removed.
+        "typing==3.6.2",
+    ],
     py_modules=['eth_keys'],
     license="MIT",
     zip_safe=False,
