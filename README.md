@@ -4,6 +4,8 @@
 A common API for Ethereum key operations with pluggable backends.
 
 
+> This library and repository was previously located at https://github.com/pipermerriam/ethereum-keys.  It was transferred to the Ethereum foundation github in November 2017 and renamed to `eth-keys`.  The PyPi package was also renamed from `ethereum-keys` to `eth-keys.
+
 ## Installation
 
 ```sh
