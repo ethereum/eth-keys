@@ -18,10 +18,10 @@ setup(
     include_package_data=True,
     setup_requires=['setuptools-markdown'],
     install_requires=[
-        "eth-utils>=0.5.0",
-        "cytoolz>=0.8.2",
+        "eth-utils>=0.5.0<1.0.0",
+        "cytoolz>=0.9.0,<1.0.0",
         # can be removed when py27/34 are removed.
-        "typing==3.6.2",
+        "typing>=3.6.2,<4.0.0;python_version<'3.5'",
     ],
     py_modules=['eth_keys'],
     license="MIT",
