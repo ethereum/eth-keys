@@ -25,6 +25,8 @@ matrix:
     env: TOX_ENV=py34-core
   - python: "3.5"
     env: TOX_ENV=py35-core
+  - python: "3.6"
+    env: TOX_ENV=py36-core
   # backends
   - python: "2.7"
     env: TOX_ENV=py27-backends
@@ -32,6 +34,8 @@ matrix:
     env: TOX_ENV=py34-backends
   - python: "3.5"
     env: TOX_ENV=py35-backends
+  - python: "3.6"
+    env: TOX_ENV=py36-backends
 cache:
   pip: true
 install:
