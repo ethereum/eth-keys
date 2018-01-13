@@ -140,7 +140,7 @@ to the desired backend.
 ### `KeyAPI.ecdsa_sign(message_hash, private_key) -> Signature`
 
 This method returns a signature for the given `message_hash`, signed by the
-provided `public_key`.
+provided `private_key`.
 
 * `message_hash`: **must** be a byte string of length 32
 * `private_key`: **must** be an instance of `PrivateKey`
