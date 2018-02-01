@@ -19,8 +19,6 @@ matrix:
   - python: "3.5"
     env: TOX_ENV=mypy
   # core
-  - python: "2.7"
-    env: TOX_ENV=py27-core
   - python: "3.4"
     env: TOX_ENV=py34-core
   - python: "3.5"
@@ -28,8 +26,6 @@ matrix:
   - python: "3.6"
     env: TOX_ENV=py36-core
   # backends
-  - python: "2.7"
-    env: TOX_ENV=py27-backends
   - python: "3.4"
     env: TOX_ENV=py34-backends
   - python: "3.5"
