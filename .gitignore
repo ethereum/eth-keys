@@ -48,6 +48,7 @@ docs/_build
 
 # tox/pytest cache
 .cache
+.mypy_cache/
 
 # Test output logs
 logs

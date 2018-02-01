@@ -20,8 +20,6 @@ setup(
     install_requires=[
         "eth-utils>=1.0.0-beta.1,<2.0.0",
         "cytoolz>=0.9.0,<1.0.0",
-        # can be removed when py27/34 are removed.
-        "typing>=3.6.2,<4.0.0;python_version<'3.5'",
     ],
     py_modules=['eth_keys'],
     license="MIT",
@@ -29,14 +27,12 @@ setup(
     keywords='ethereum',
     packages=find_packages(exclude=["tests", "tests.*"]),
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )
