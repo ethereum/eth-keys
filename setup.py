@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     setup_requires=['setuptools-markdown'],
     install_requires=[
-        "eth-utils>=1.0.0-beta.1,<2.0.0",
+        "eth-utils>=1.0.0-beta.2,<2.0.0",
         "cytoolz>=0.9.0,<1.0.0",
     ],
     py_modules=['eth_keys'],
