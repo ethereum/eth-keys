@@ -13,21 +13,25 @@ addons:
 matrix:
   include:
   # lint
-  - python: "3.5"
+  - python: "3.6"
     env: TOX_ENV=flake8
   # mypy
-  - python: "3.5"
+  - python: "3.6"
     env: TOX_ENV=mypy
   # core
   - python: "3.5"
     env: TOX_ENV=py35-core
   - python: "3.6"
     env: TOX_ENV=py36-core
+  #- python: "pypy3"
+  #- env: TOX_ENV=pypy3-core
   # backends
   - python: "3.5"
     env: TOX_ENV=py35-backends
   - python: "3.6"
     env: TOX_ENV=py36-backends
+  #- python: "pypy3"
+  #- env: TOX_ENV=pypy3-backends
 cache:
   pip: true
 install:
