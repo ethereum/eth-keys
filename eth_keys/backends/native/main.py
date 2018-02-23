@@ -20,7 +20,7 @@ class NativeECCBackend(BaseECCBackend):
     def ecdsa_sign(self, msg_hash, private_key):
         # type: (bytes, PrivateKey) -> Signature
         signature_vrs = ecdsa_raw_sign(msg_hash, private_key.to_bytes())
-        signature = self.Signature(vrs=signature_vrs)
+        signature = Signature(vrs=signature_vrs, backend=self)
         return signature
 
     def ecdsa_recover(self,
@@ -29,11 +29,11 @@ class NativeECCBackend(BaseECCBackend):
                       ):
         # type: (...) -> Optional[PublicKey]
         public_key_bytes = ecdsa_raw_recover(msg_hash, signature.vrs)
-        public_key = self.PublicKey(public_key_bytes)
+        public_key = PublicKey(public_key_bytes, backend=self)
         return public_key
 
     def private_key_to_public_key(self, private_key):
         # type: (PrivateKey) -> PublicKey
         public_key_bytes = private_key_to_public_key(private_key.to_bytes())
-        public_key = self.PublicKey(public_key_bytes)
+        public_key = PublicKey(public_key_bytes, backend=self)
         return public_key

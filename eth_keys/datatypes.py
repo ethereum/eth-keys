@@ -9,6 +9,7 @@ from eth_utils import (
     big_endian_to_int,
     int_to_big_endian,
     is_bytes,
+    is_string,
     keccak,
     to_checksum_address,
     to_normalized_address,
@@ -57,32 +58,47 @@ else:
     ByteString = collections.abc.ByteString
 
 
-class BackendProxied(object):
-    _backend = None
-
+class LazyBackend(object):
     def __init__(self, backend=None):
-        if backend is not None:
-            self._backend = backend
+        # type: (BaseECCBackend) -> None
+        from eth_keys.backends.base import (  # noqa: F811
+            BaseECCBackend,
+        )
+
+        if backend is None:
+            pass
+        elif isinstance(backend, BaseECCBackend):
+            pass
+        elif isinstance(backend, type) and issubclass(backend, BaseECCBackend):
+            backend = backend()
+        elif is_string(backend):
+            backend = self.get_backend(backend)
+        else:
+            raise ValueError(
+                "Unsupported format for ECC backend.  Must be an instance or "
+                "subclass of `eth_keys.backends.BaseECCBackend` or a string of "
+                "the dot-separated import path for the desired backend class"
+            )
+
+        self.backend = backend
+
+    _backend = None
 
     @property
     def backend(self):
-        # type: () -> BaseECCBackend
-        from eth_keys.backends import get_backend
-
         if self._backend is None:
-            return get_backend()
+            return self.get_backend()
         else:
             return self._backend
 
-    @classmethod
-    def get_backend(cls):
-        # type: () -> BaseECCBackend
-        from eth_keys.backends import get_backend
+    @backend.setter
+    def backend(self, value):
+        self._backend = value
 
-        if cls._backend is None:
-            return get_backend()
-        else:
-            return cls._backend
+    @classmethod
+    def get_backend(cls, *args, **kwargs):
+        from eth_keys.backends import get_backend
+        return get_backend(*args, **kwargs)
 
 
 class BaseKey(ByteString, collections.Hashable):
@@ -141,29 +157,33 @@ class BaseKey(ByteString, collections.Hashable):
             return self.to_hex()
 
 
-class PublicKey(BaseKey, BackendProxied):
+class PublicKey(BaseKey, LazyBackend):
     def __init__(self, public_key_bytes, **kwargs):
-        # type: (bytes) -> None
+        # type: (bytes, Optional[BaseECCBackend]) -> None
         validate_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
         super().__init__(**kwargs)
 
     @classmethod
-    def from_private(cls, private_key):
-        # type: (PrivateKey) -> PublicKey
-        return cls.get_backend().private_key_to_public_key(private_key)
+    def from_private(cls, private_key, backend=None):
+        # type: (PrivateKey, Optional[BaseECCBackend]) -> PublicKey
+        if backend is None:
+            backend = cls.get_backend()
+        return backend.private_key_to_public_key(private_key)
 
     @classmethod
-    def recover_from_msg(cls, message, signature):
-        # type: (bytes, Signature) -> PublicKey
+    def recover_from_msg(cls, message, signature, backend=None):
+        # type: (bytes, Signature, Optional[BaseECCBackend]) -> PublicKey
         message_hash = keccak(message)
-        return cls.recover_from_msg_hash(message_hash, signature)
+        return cls.recover_from_msg_hash(message_hash, signature, backend)
 
     @classmethod
-    def recover_from_msg_hash(cls, message_hash, signature):
-        # type: (bytes, Signature) -> PublicKey
-        return cls.get_backend().ecdsa_recover(message_hash, signature)
+    def recover_from_msg_hash(cls, message_hash, signature, backend=None):
+        # type: (bytes, Signature, Optional[BaseECCBackend]) -> PublicKey
+        if backend is None:
+            backend = cls.get_backend()
+        return backend.ecdsa_recover(message_hash, signature)
 
     def verify_msg(self, message, signature):
         # type: (bytes, Signature) -> bool
@@ -190,11 +210,11 @@ class PublicKey(BaseKey, BackendProxied):
         return public_key_bytes_to_address(self.to_bytes())
 
 
-class PrivateKey(BaseKey, BackendProxied):
+class PrivateKey(BaseKey, LazyBackend):
     public_key = None  # type: PublicKey
 
     def __init__(self, private_key_bytes, **kwargs):
-        # type: (bytes) -> None
+        # type: (bytes, Optional[BaseECCBackend]) -> None
         validate_private_key_bytes(private_key_bytes)
 
         self._raw_key = private_key_bytes
@@ -212,14 +232,14 @@ class PrivateKey(BaseKey, BackendProxied):
         return self.backend.ecdsa_sign(message_hash, self)
 
 
-class Signature(ByteString, BackendProxied):
+class Signature(ByteString, LazyBackend):
     _backend = None
     _v = None  # type: int
     _r = None  # type: int
     _s = None  # type: int
 
     def __init__(self, signature_bytes=None, vrs=None, **kwargs):
-        # type: (Optional[bytes], Optional[Tuple[int, int, int]]) -> None
+        # type: (Optional[bytes], Optional[Tuple[int, int, int]], Optional[BaseECCBackend]) -> None
         if bool(signature_bytes) is bool(vrs):
             raise TypeError("You must provide one of `signature_bytes` or `vrs`")
         elif signature_bytes:

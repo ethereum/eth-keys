@@ -46,7 +46,7 @@ class CoinCurveECCBackend(BaseECCBackend):
             msg_hash,
             hasher=None,
         )
-        signature = self.Signature(signature_bytes)
+        signature = Signature(signature_bytes, backend=self)
         return signature
 
     def ecdsa_recover(self,
@@ -65,7 +65,7 @@ class CoinCurveECCBackend(BaseECCBackend):
             # `coincurve` can raise `ValueError` or `Exception` dependending on
             # how the signature is invalid.
             raise BadSignature(str(err))
-        public_key = self.PublicKey(public_key_bytes)
+        public_key = PublicKey(public_key_bytes, backend=self)
         return public_key
 
     def private_key_to_public_key(self, private_key):
@@ -73,4 +73,4 @@ class CoinCurveECCBackend(BaseECCBackend):
         public_key_bytes = self.keys.PrivateKey(private_key.to_bytes()).public_key.format(
             compressed=False,
         )[1:]
-        return self.PublicKey(public_key_bytes)
+        return PublicKey(public_key_bytes, backend=self)

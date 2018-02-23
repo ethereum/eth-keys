@@ -18,6 +18,7 @@ from eth_keys.utils.padding import (
     pad32,
 )
 
+from eth_keys import KeyAPI
 from eth_keys.backends import CoinCurveECCBackend
 from eth_keys.backends import NativeECCBackend
 from eth_keys.constants import (
@@ -41,13 +42,13 @@ MAX_EXAMPLES = 200
 
 
 @pytest.fixture
-def native_backend():
-    return NativeECCBackend()
+def native_key_api():
+    return KeyAPI(backend=NativeECCBackend())
 
 
 @pytest.fixture
-def coincurve_backend():
-    return CoinCurveECCBackend()
+def coincurve_key_api():
+    return KeyAPI(backend=CoinCurveECCBackend())
 
 
 @given(
@@ -60,14 +61,14 @@ def coincurve_backend():
 @settings(max_examples=MAX_EXAMPLES)
 def test_public_key_generation_is_equal(private_key_bytes,
                                         direction,
-                                        native_backend,
-                                        coincurve_backend):
+                                        native_key_api,
+                                        coincurve_key_api):
     if direction == 'coincurve-to-native':
-        backend_a = coincurve_backend
-        backend_b = native_backend
+        backend_a = coincurve_key_api
+        backend_b = native_key_api
     elif direction == 'native-to-coincurve':
-        backend_b = coincurve_backend
-        backend_a = native_backend
+        backend_b = coincurve_key_api
+        backend_a = native_key_api
     else:
         assert False, "invariant"
 
@@ -89,14 +90,14 @@ def test_public_key_generation_is_equal(private_key_bytes,
 def test_native_to_coincurve_recover(private_key_bytes,
                                      message_hash,
                                      direction,
-                                     native_backend,
-                                     coincurve_backend):
+                                     native_key_api,
+                                     coincurve_key_api):
     if direction == 'coincurve-to-native':
-        backend_a = coincurve_backend
-        backend_b = native_backend
+        backend_a = coincurve_key_api
+        backend_b = native_key_api
     elif direction == 'native-to-coincurve':
-        backend_b = coincurve_backend
-        backend_a = native_backend
+        backend_b = coincurve_key_api
+        backend_a = native_key_api
     else:
         assert False, "invariant"
 
@@ -119,14 +120,14 @@ def test_native_to_coincurve_recover(private_key_bytes,
 def test_coincurve_to_native_invalid_signatures(message_hash,
                                                 signature_bytes,
                                                 direction,
-                                                native_backend,
-                                                coincurve_backend):
+                                                native_key_api,
+                                                coincurve_key_api):
     if direction == 'coincurve-to-native':
-        backend_a = coincurve_backend
-        backend_b = native_backend
+        backend_a = coincurve_key_api
+        backend_b = native_key_api
     elif direction == 'native-to-coincurve':
-        backend_b = coincurve_backend
-        backend_a = native_backend
+        backend_b = coincurve_key_api
+        backend_a = native_key_api
     else:
         assert False, "invariant"
 

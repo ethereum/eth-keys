@@ -1,14 +1,7 @@
 from typing import (Any, Optional, Union)  # noqa: F401
 
-from eth_utils import (
-    is_string,
-)
-
-from eth_keys.backends import (
-    BaseECCBackend,
-    get_backend,
-)
 from eth_keys.datatypes import (
+    LazyBackend,
     PublicKey,
     PrivateKey,
     Signature,
@@ -21,57 +14,17 @@ from eth_keys.validation import (
 )
 
 
-def backend_property_proxy(name):
-    @property
-    def property_fn(self):
-        backend_property = getattr(self.backend, name)
-        return backend_property
-    return property_fn
-
-
-class KeyAPI(object):
-    backend = None
-
-    def __init__(self, backend=None):
-        if backend is None:
-            pass
-        elif isinstance(backend, BaseECCBackend):
-            pass
-        elif isinstance(backend, type) and issubclass(backend, BaseECCBackend):
-            backend = backend()
-        elif is_string(backend):
-            backend = get_backend(backend)
-        else:
-            raise ValueError(
-                "Unsupported format for ECC backend.  Must be an instance or "
-                "subclass of `eth_keys.backends.BaseECCBackend` or a string of "
-                "the dot-separated import path for the desired backend class"
-            )
-
-        self.backend = backend
-
-    _backend = None
-
-    @property
-    def backend(self):
-        if self._backend is None:
-            return get_backend()
-        else:
-            return self._backend
-
-    @backend.setter
-    def backend(self, value):
-        self._backend = value
+class KeyAPI(LazyBackend):
+    #
+    # datatype shortcuts
+    #
+    PublicKey = PublicKey  # type: Any
+    PrivateKey = PrivateKey  # type: Any
+    Signature = Signature  # type: Any
 
     #
     # Proxy method calls to the backends
     #
-    # Mypy cannot detect the type of dynamically computed classes
-    # (https://github.com/python/mypy/issues/2477), so we must annotate those with Any
-    PublicKey = backend_property_proxy('PublicKey')  # type: Any
-    PrivateKey = backend_property_proxy('PrivateKey')  # type: Any
-    Signature = backend_property_proxy('Signature')  # type: Any
-
     def ecdsa_sign(self,
                    message_hash,  # type: bytes
                    private_key  # type: Union[PrivateKey, bytes]

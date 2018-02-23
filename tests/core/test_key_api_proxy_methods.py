@@ -39,12 +39,6 @@ def signature(private_key):
     return private_key.sign_msg_hash(MSGHASH)
 
 
-def test_proxied_backend_properties(key_api, ecc_backend):
-    assert key_api.PublicKey is ecc_backend.PublicKey
-    assert key_api.PrivateKey is ecc_backend.PrivateKey
-    assert key_api.Signature is ecc_backend.Signature
-
-
 def test_key_api_ecdsa_sign_validation(key_api, private_key):
     with pytest.raises(ValidationError):
         key_api.ecdsa_sign(MSGHASH, private_key.to_bytes())
