@@ -60,6 +60,10 @@ else:
 class BackendProxied(object):
     _backend = None
 
+    def __init__(self, backend=None):
+        if backend is not None:
+            self._backend = backend
+
     @property
     def backend(self):
         # type: () -> BaseECCBackend
@@ -138,11 +142,12 @@ class BaseKey(ByteString, collections.Hashable):
 
 
 class PublicKey(BaseKey, BackendProxied):
-    def __init__(self, public_key_bytes):
+    def __init__(self, public_key_bytes, **kwargs):
         # type: (bytes) -> None
         validate_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
+        super().__init__(**kwargs)
 
     @classmethod
     def from_private(cls, private_key):
@@ -188,13 +193,14 @@ class PublicKey(BaseKey, BackendProxied):
 class PrivateKey(BaseKey, BackendProxied):
     public_key = None  # type: PublicKey
 
-    def __init__(self, private_key_bytes):
+    def __init__(self, private_key_bytes, **kwargs):
         # type: (bytes) -> None
         validate_private_key_bytes(private_key_bytes)
 
         self._raw_key = private_key_bytes
 
         self.public_key = self.backend.private_key_to_public_key(self)
+        super().__init__(**kwargs)
 
     def sign_msg(self, message):
         # type: (bytes) -> Signature
@@ -212,7 +218,7 @@ class Signature(ByteString, BackendProxied):
     _r = None  # type: int
     _s = None  # type: int
 
-    def __init__(self, signature_bytes=None, vrs=None):
+    def __init__(self, signature_bytes=None, vrs=None, **kwargs):
         # type: (Optional[bytes], Optional[Tuple[int, int, int]]) -> None
         if bool(signature_bytes) is bool(vrs):
             raise TypeError("You must provide one of `signature_bytes` or `vrs`")
@@ -234,6 +240,8 @@ class Signature(ByteString, BackendProxied):
                 raise BadSignature(str(err))
         else:
             raise TypeError("Invariant: unreachable code path")
+
+        super().__init__(**kwargs)
 
     #
     # v
