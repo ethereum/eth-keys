@@ -1,7 +1,5 @@
 from typing import Any  # noqa: F401
 
-from eth_keys import datatypes
-
 
 class BaseECCBackend(object):
     def ecdsa_sign(self,
