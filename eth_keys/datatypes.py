@@ -125,7 +125,9 @@ class BaseKey(ByteString, collections.Hashable):
         # TODO: this seems wrong.
         return 64
 
-    def __getitem__(self, index: int) -> bytes:
+    # Must be typed with `ignore` due to
+    # https://github.com/python/mypy/issues/1237
+    def __getitem__(self, index: int) -> int:  # type: ignore
         return self._raw_key[index]
 
     def __eq__(self, other: Any) -> bool:
@@ -349,7 +351,9 @@ class Signature(ByteString, LazyBackend):
         else:
             return False
 
-    def __getitem__(self, index) -> bytes:
+    # Must be typed with `ignore` due to
+    # https://github.com/python/mypy/issues/1237
+    def __getitem__(self, index: int) -> int:  # type: ignore
         return self.to_bytes()[index]
 
     def __repr__(self) -> str:

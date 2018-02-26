@@ -1,4 +1,4 @@
-from typing import (Any, Union)  # noqa: F401
+from typing import (Any, Union, Type)  # noqa: F401
 
 from eth_keys.datatypes import (
     LazyBackend,
@@ -14,22 +14,27 @@ from eth_keys.validation import (
 )
 
 
+_PublicKey = PublicKey
+_PrivateKey = PrivateKey
+_Signature = Signature
+
+
 class KeyAPI(LazyBackend):
     #
     # datatype shortcuts
     #
-    PublicKey = PublicKey  # type: PublicKey
-    PrivateKey = PrivateKey  # type: PrivateKey
-    Signature = Signature  # type: Signature
+    PublicKey = PublicKey  # type: Type[_PublicKey]
+    PrivateKey = PrivateKey  # type: Type[_PrivateKey]
+    Signature = Signature  # type: Type[_Signature]
 
     #
     # Proxy method calls to the backends
     #
     def ecdsa_sign(self,
                    message_hash,  # type: bytes
-                   private_key  # type: PrivateKey
+                   private_key  # type: _PrivateKey
                    ):
-        # type: (...) -> Signature
+        # type: (...) -> _Signature
         validate_message_hash(message_hash)
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
@@ -45,8 +50,8 @@ class KeyAPI(LazyBackend):
 
     def ecdsa_verify(self,
                      message_hash,  # type: bytes
-                     signature,  # type: Signature
-                     public_key  # type: PublicKey
+                     signature,  # type: _Signature
+                     public_key  # type: _PublicKey
                      ):
         # type: (...) -> bool
         if not isinstance(public_key, PublicKey):
@@ -57,16 +62,16 @@ class KeyAPI(LazyBackend):
 
     def ecdsa_recover(self,
                       message_hash,  # type: bytes
-                      signature  # type: Signature
+                      signature  # type: _Signature
                       ):
-        # type: (...) -> PublicKey
+        # type: (...) -> _PublicKey
         validate_message_hash(message_hash)
         if not isinstance(signature, Signature):
             raise ValidationError(
                 "The `signature` must be an instance of `eth_keys.datatypes.Signature`"
             )
         public_key = self.backend.ecdsa_recover(message_hash, signature)
-        if not isinstance(public_key, PublicKey):
+        if not isinstance(public_key, _PublicKey):
             raise ValidationError(
                 "Backend returned an invalid public_key.  Return value must be "
                 "an instance of `eth_keys.datatypes.PublicKey`"
