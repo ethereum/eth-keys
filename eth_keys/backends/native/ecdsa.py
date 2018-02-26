@@ -35,14 +35,13 @@ from .jacobian import (
 )
 
 
-def decode_public_key(public_key_bytes):
+def decode_public_key(public_key_bytes: bytes) -> Tuple[int, int]:
     left = big_endian_to_int(public_key_bytes[0:32])
     right = big_endian_to_int(public_key_bytes[32:64])
     return left, right
 
 
-def encode_raw_public_key(raw_public_key):
-    # type: (Tuple[int, int]) -> bytes
+def encode_raw_public_key(raw_public_key: Tuple[int, int]) -> bytes:
     left, right = raw_public_key
     return b''.join((
         pad32(int_to_big_endian(left)),
@@ -50,8 +49,7 @@ def encode_raw_public_key(raw_public_key):
     ))
 
 
-def private_key_to_public_key(private_key_bytes):
-    # type: (bytes) -> bytes
+def private_key_to_public_key(private_key_bytes: bytes) -> bytes:
     private_key_as_num = big_endian_to_int(private_key_bytes)
 
     if private_key_as_num >= N:
@@ -62,8 +60,9 @@ def private_key_to_public_key(private_key_bytes):
     return public_key_bytes
 
 
-def deterministic_generate_k(msg_hash, private_key_bytes, digest_fn=hashlib.sha256):
-    # type: (bytes, bytes, Callable[[], Any]) -> int
+def deterministic_generate_k(msg_hash: bytes,
+                             private_key_bytes: bytes,
+                             digest_fn: Callable[[], Any]=hashlib.sha256) -> int:
     v_0 = b'\x01' * 32
     k_0 = b'\x00' * 32
 
@@ -77,8 +76,8 @@ def deterministic_generate_k(msg_hash, private_key_bytes, digest_fn=hashlib.sha2
     return k
 
 
-def ecdsa_raw_sign(msg_hash, private_key_bytes):
-    # type: (bytes, bytes) -> Tuple[int, int, int]
+def ecdsa_raw_sign(msg_hash: bytes,
+                   private_key_bytes: bytes) -> Tuple[int, int, int]:
     z = big_endian_to_int(msg_hash)
     k = deterministic_generate_k(msg_hash, private_key_bytes)
 
@@ -91,8 +90,9 @@ def ecdsa_raw_sign(msg_hash, private_key_bytes):
     return v - 27, r, s
 
 
-def ecdsa_raw_verify(msg_hash, vrs, public_key_bytes):
-    # type: (bytes, Tuple[int, int, int], bytes) -> Optional[bool]
+def ecdsa_raw_verify(msg_hash: bytes,
+                     vrs: Tuple[int, int, int],
+                     public_key_bytes: bytes) -> bool:
     raw_public_key = decode_public_key(public_key_bytes)
 
     v, r, s = vrs
@@ -111,8 +111,8 @@ def ecdsa_raw_verify(msg_hash, vrs, public_key_bytes):
     return bool(r == x and (r % N) and (s % N))
 
 
-def ecdsa_raw_recover(msg_hash, vrs):
-    # type: (bytes, Tuple[int, int, int]) -> Optional[bytes]
+def ecdsa_raw_recover(msg_hash: bytes,
+                      vrs: Tuple[int, int, int]) -> bytes:
     v, r, s = vrs
     v += 27
 

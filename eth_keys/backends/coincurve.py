@@ -14,8 +14,7 @@ from eth_keys.exceptions import (
 from .base import BaseECCBackend
 
 
-def is_coincurve_available():
-    # type: () -> bool
+def is_coincurve_available() -> bool:
     try:
         import coincurve  # noqa: F401
     except ImportError:
@@ -25,8 +24,7 @@ def is_coincurve_available():
 
 
 class CoinCurveECCBackend(BaseECCBackend):
-    def __init__(self):
-        # type: () -> None
+    def __init__(self) -> None:
         try:
             import coincurve
         except ImportError:
@@ -37,10 +35,8 @@ class CoinCurveECCBackend(BaseECCBackend):
         super(CoinCurveECCBackend, self).__init__()
 
     def ecdsa_sign(self,
-                   msg_hash,  # type: bytes
-                   private_key  # type: PrivateKey
-                   ):
-        # type: (...) -> Signature
+                   msg_hash: bytes,
+                   private_key: PrivateKey) -> Signature:
         private_key_bytes = private_key.to_bytes()
         signature_bytes = self.keys.PrivateKey(private_key_bytes).sign_recoverable(
             msg_hash,
@@ -50,10 +46,8 @@ class CoinCurveECCBackend(BaseECCBackend):
         return signature
 
     def ecdsa_recover(self,
-                      msg_hash,  # type: bytes
-                      signature  # type: Signature
-                      ):
-        # type: (...) -> Optional[PublicKey]
+                      msg_hash: bytes,
+                      signature: Signature) -> PublicKey:
         signature_bytes = signature.to_bytes()
         try:
             public_key_bytes = self.keys.PublicKey.from_signature_and_message(
@@ -68,8 +62,7 @@ class CoinCurveECCBackend(BaseECCBackend):
         public_key = PublicKey(public_key_bytes, backend=self)
         return public_key
 
-    def private_key_to_public_key(self, private_key):
-        # type: (PrivateKey) -> PublicKey
+    def private_key_to_public_key(self, private_key: PrivateKey) -> PublicKey:
         public_key_bytes = self.keys.PrivateKey(private_key.to_bytes()).public_key.format(
             compressed=False,
         )[1:]
