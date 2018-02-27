@@ -192,16 +192,14 @@ class PublicKey(BaseKey, LazyBackend):
     def verify_msg(self,
                    message: bytes,
                    signature,  # type: Signature
-                   ):
-        # type: (...) -> bool
+                   ) -> bool:
         message_hash = keccak(message)
         return self.verify_msg_hash(message_hash, signature)
 
     def verify_msg_hash(self,
                         message_hash: bytes,
                         signature,  # type: Signature
-                        ):
-        # type: (...) -> bool
+                        ) -> bool:
         return self.backend.ecdsa_verify(message_hash, signature, self)
 
     #

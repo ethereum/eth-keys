@@ -14,6 +14,8 @@ from eth_keys.validation import (
 )
 
 
+# These must be aliased due to a scoping issue in mypy
+# https://github.com/python/mypy/issues/1775
 _PublicKey = PublicKey
 _PrivateKey = PrivateKey
 _Signature = Signature
@@ -52,8 +54,7 @@ class KeyAPI(LazyBackend):
                      message_hash,  # type: bytes
                      signature,  # type: _Signature
                      public_key  # type: _PublicKey
-                     ):
-        # type: (...) -> bool
+                     ) -> bool:
         if not isinstance(public_key, PublicKey):
             raise ValidationError(
                 "The `public_key` must be an instance of `eth_keys.datatypes.PublicKey`"
