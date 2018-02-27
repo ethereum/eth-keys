@@ -1,14 +1,7 @@
-from typing import (Any, Optional, Union)  # noqa: F401
+from typing import (Any, Union, Type)  # noqa: F401
 
-from eth_utils import (
-    is_string,
-)
-
-from eth_keys.backends import (
-    BaseECCBackend,
-    get_backend,
-)
 from eth_keys.datatypes import (
+    LazyBackend,
     PublicKey,
     PrivateKey,
     Signature,
@@ -21,62 +14,29 @@ from eth_keys.validation import (
 )
 
 
-def backend_property_proxy(name):
-    @property
-    def property_fn(self):
-        backend_property = getattr(self.backend, name)
-        return backend_property
-    return property_fn
+# These must be aliased due to a scoping issue in mypy
+# https://github.com/python/mypy/issues/1775
+_PublicKey = PublicKey
+_PrivateKey = PrivateKey
+_Signature = Signature
 
 
-class KeyAPI(object):
-    backend = None
-
-    def __init__(self, backend=None):
-        if backend is None:
-            pass
-        elif isinstance(backend, BaseECCBackend):
-            pass
-        elif isinstance(backend, type) and issubclass(backend, BaseECCBackend):
-            backend = backend()
-        elif is_string(backend):
-            backend = get_backend(backend)
-        else:
-            raise ValueError(
-                "Unsupported format for ECC backend.  Must be an instance or "
-                "subclass of `eth_keys.backends.BaseECCBackend` or a string of "
-                "the dot-separated import path for the desired backend class"
-            )
-
-        self.backend = backend
-
-    _backend = None
-
-    @property
-    def backend(self):
-        if self._backend is None:
-            return get_backend()
-        else:
-            return self._backend
-
-    @backend.setter
-    def backend(self, value):
-        self._backend = value
+class KeyAPI(LazyBackend):
+    #
+    # datatype shortcuts
+    #
+    PublicKey = PublicKey  # type: Type[_PublicKey]
+    PrivateKey = PrivateKey  # type: Type[_PrivateKey]
+    Signature = Signature  # type: Type[_Signature]
 
     #
     # Proxy method calls to the backends
     #
-    # Mypy cannot detect the type of dynamically computed classes
-    # (https://github.com/python/mypy/issues/2477), so we must annotate those with Any
-    PublicKey = backend_property_proxy('PublicKey')  # type: Any
-    PrivateKey = backend_property_proxy('PrivateKey')  # type: Any
-    Signature = backend_property_proxy('Signature')  # type: Any
-
     def ecdsa_sign(self,
                    message_hash,  # type: bytes
-                   private_key  # type: Union[PrivateKey, bytes]
+                   private_key  # type: _PrivateKey
                    ):
-        # type: (...) -> Optional[Signature]
+        # type: (...) -> _Signature
         validate_message_hash(message_hash)
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
@@ -92,10 +52,9 @@ class KeyAPI(object):
 
     def ecdsa_verify(self,
                      message_hash,  # type: bytes
-                     signature,  # type: Union[Signature, bytes]
-                     public_key  # type: Union[PublicKey, bytes]
-                     ):
-        # type: (...) -> Optional[bool]
+                     signature,  # type: _Signature
+                     public_key  # type: _PublicKey
+                     ) -> bool:
         if not isinstance(public_key, PublicKey):
             raise ValidationError(
                 "The `public_key` must be an instance of `eth_keys.datatypes.PublicKey`"
@@ -104,16 +63,16 @@ class KeyAPI(object):
 
     def ecdsa_recover(self,
                       message_hash,  # type: bytes
-                      signature  # type: Union[Signature, bytes]
+                      signature  # type: _Signature
                       ):
-        # type: (...) -> Optional[PublicKey]
+        # type: (...) -> _PublicKey
         validate_message_hash(message_hash)
         if not isinstance(signature, Signature):
             raise ValidationError(
                 "The `signature` must be an instance of `eth_keys.datatypes.Signature`"
             )
         public_key = self.backend.ecdsa_recover(message_hash, signature)
-        if not isinstance(public_key, PublicKey):
+        if not isinstance(public_key, _PublicKey):
             raise ValidationError(
                 "Backend returned an invalid public_key.  Return value must be "
                 "an instance of `eth_keys.datatypes.PublicKey`"
