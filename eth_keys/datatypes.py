@@ -152,11 +152,12 @@ class BaseKey(ByteString, collections.Hashable):
 
 
 class PublicKey(BaseKey, LazyBackend):
-    def __init__(self, public_key_bytes: bytes, **kwargs) -> None:
+    def __init__(self, public_key_bytes, backend=None):
+        # type: (bytes, Union[BaseECCBackend, Type[BaseECCBackend], str, None]) -> None
         validate_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
-        super().__init__(**kwargs)
+        super().__init__(backend=backend)
 
     @classmethod
     def from_private(cls,
@@ -218,13 +219,14 @@ class PublicKey(BaseKey, LazyBackend):
 class PrivateKey(BaseKey, LazyBackend):
     public_key = None  # type: PublicKey
 
-    def __init__(self, private_key_bytes: bytes, **kwargs) -> None:
+    def __init__(self, private_key_bytes, backend=None):
+        # type: (bytes, Union[BaseECCBackend, Type[BaseECCBackend], str, None]) -> None
         validate_private_key_bytes(private_key_bytes)
 
         self._raw_key = private_key_bytes
 
         self.public_key = self.backend.private_key_to_public_key(self)
-        super().__init__(**kwargs)
+        super().__init__(backend=backend)
 
     def sign_msg(self, message: bytes):
         # type: (...) -> Signature
@@ -244,7 +246,8 @@ class Signature(ByteString, LazyBackend):
     def __init__(self,
                  signature_bytes: bytes=None,
                  vrs: Tuple[int, int, int]=None,
-                 **kwargs) -> None:
+                 backend=None,  # type: Union[BaseECCBackend, Type[BaseECCBackend], str, None]
+                 ) -> None:
         if bool(signature_bytes) is bool(vrs):
             raise TypeError("You must provide one of `signature_bytes` or `vrs`")
         elif signature_bytes:
@@ -266,7 +269,7 @@ class Signature(ByteString, LazyBackend):
         else:
             raise TypeError("Invariant: unreachable code path")
 
-        super().__init__(**kwargs)
+        super().__init__(backend=backend)
 
     #
     # v
