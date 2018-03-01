@@ -95,7 +95,7 @@ True
 ### `KeyAPI(backend=None)`
 
 The `KeyAPI` object is the primary API for interacting with the `eth-keys`
-libary.  The object takes a single optional argument in it's constructor which
+libary.  The object takes a single optional argument in its constructor which
 designates what backend will be used for eliptical curve cryptography
 operations.  The built-in backends are:
 
