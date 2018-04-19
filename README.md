@@ -4,7 +4,7 @@
 A common API for Ethereum key operations with pluggable backends.
 
 
-> This library and repository was previously located at https://github.com/pipermerriam/ethereum-keys.  It was transferred to the Ethereum foundation github in November 2017 and renamed to `eth-keys`.  The PyPi package was also renamed from `ethereum-keys` to `eth-keys.
+> This library and repository was previously located at https://github.com/pipermerriam/ethereum-keys.  It was transferred to the Ethereum foundation github in November 2017 and renamed to `eth-keys`.  The PyPi package was also renamed from `ethereum-keys` to `eth-keys`.
 
 ## Installation
 
@@ -99,7 +99,7 @@ libary.  The object takes a single optional argument in its constructor which
 designates what backend will be used for eliptical curve cryptography
 operations.  The built-in backends are:
 
-* `eth_keys.backends.NativeECCBackend` A pure python implementation of the ECC operations.
+* `eth_keys.backends.NativeECCBackend`: A pure python implementation of the ECC operations.
 * `eth_keys.backends.CoinCurveECCBackend`: Uses the [`coincurve`](https://github.com/ofek/coincurve) library for ECC operations.
 
 By default, `eth-keys` will *try* to use the `CoinCurveECCBackend`,
