@@ -85,7 +85,7 @@ new version explicitly, like `make release bump="--new-version 2.0.0-alpha.1 dev
 '0x1a642f0E3c3aF545E7AcBD38b07251B3990914F1'
 >>> signature.verify_msg(b'a message', pk.public_key)
 True
->>> signature.recover_msg(b'a message') == pk.public_key
+>>> signature.recover_public_key_from_msg(b'a message') == pk.public_key
 True
 ```
 
