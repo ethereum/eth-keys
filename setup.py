@@ -26,6 +26,7 @@ setup(
     zip_safe=False,
     keywords='ethereum',
     packages=find_packages(exclude=["tests", "tests.*"]),
+    package_data={'eth-keys': ['py.typed']},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
