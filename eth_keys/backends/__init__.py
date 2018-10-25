@@ -22,7 +22,7 @@ def get_default_backend_class() -> str:
         return 'eth_keys.backends.NativeECCBackend'
 
 
-def get_backend_class(import_path: str=None) -> Type[BaseECCBackend]:
+def get_backend_class(import_path: str = None) -> Type[BaseECCBackend]:
     if import_path is None:
         import_path = os.environ.get(
             'ECC_BACKEND_CLASS',
@@ -31,6 +31,6 @@ def get_backend_class(import_path: str=None) -> Type[BaseECCBackend]:
     return import_string(import_path)
 
 
-def get_backend(import_path: str=None) -> BaseECCBackend:
+def get_backend(import_path: str = None) -> BaseECCBackend:
     backend_class = get_backend_class(import_path)
     return backend_class()

@@ -60,7 +60,7 @@ else:
 
 class LazyBackend:
     def __init__(self,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]'=None,
+                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
                  ) -> None:
         from eth_keys.backends.base import (  # noqa: F811
             BaseECCBackend,
@@ -155,7 +155,7 @@ class BaseKey(ByteString, collections.Hashable):
 class PublicKey(BaseKey, LazyBackend):
     def __init__(self,
                  public_key_bytes: bytes,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]'=None,
+                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
                  ) -> None:
         validate_public_key_bytes(public_key_bytes)
 
@@ -165,7 +165,7 @@ class PublicKey(BaseKey, LazyBackend):
     @classmethod
     def from_private(cls,
                      private_key: 'PrivateKey',
-                     backend: 'BaseECCBackend'=None,
+                     backend: 'BaseECCBackend' = None,
                      ) -> 'PublicKey':
         if backend is None:
             backend = cls.get_backend()
@@ -175,7 +175,7 @@ class PublicKey(BaseKey, LazyBackend):
     def recover_from_msg(cls,
                          message: bytes,
                          signature: 'Signature',
-                         backend: 'BaseECCBackend'=None,
+                         backend: 'BaseECCBackend' = None,
                          ) -> 'PublicKey':
         message_hash = keccak(message)
         return cls.recover_from_msg_hash(message_hash, signature, backend)
@@ -184,7 +184,7 @@ class PublicKey(BaseKey, LazyBackend):
     def recover_from_msg_hash(cls,
                               message_hash: bytes,
                               signature: 'Signature',
-                              backend: 'BaseECCBackend'=None,
+                              backend: 'BaseECCBackend' = None,
                               ) -> 'PublicKey':
         if backend is None:
             backend = cls.get_backend()
@@ -221,7 +221,7 @@ class PrivateKey(BaseKey, LazyBackend):
 
     def __init__(self,
                  private_key_bytes: bytes,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]'=None,
+                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
                  ) -> None:
         validate_private_key_bytes(private_key_bytes)
 
@@ -244,9 +244,9 @@ class Signature(ByteString, LazyBackend):
     _s = None  # type: int
 
     def __init__(self,
-                 signature_bytes: bytes=None,
-                 vrs: Tuple[int, int, int]=None,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]'=None,
+                 signature_bytes: bytes = None,
+                 vrs: Tuple[int, int, int] = None,
+                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
                  ) -> None:
         if bool(signature_bytes) is bool(vrs):
             raise TypeError("You must provide one of `signature_bytes` or `vrs`")

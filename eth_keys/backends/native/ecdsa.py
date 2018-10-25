@@ -62,7 +62,7 @@ def private_key_to_public_key(private_key_bytes: bytes) -> bytes:
 
 def deterministic_generate_k(msg_hash: bytes,
                              private_key_bytes: bytes,
-                             digest_fn: Callable[[], Any]=hashlib.sha256) -> int:
+                             digest_fn: Callable[[], Any] = hashlib.sha256) -> int:
     v_0 = b'\x01' * 32
     k_0 = b'\x00' * 32
 
