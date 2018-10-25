@@ -33,10 +33,9 @@ class KeyAPI(LazyBackend):
     # Proxy method calls to the backends
     #
     def ecdsa_sign(self,
-                   message_hash,  # type: bytes
-                   private_key  # type: _PrivateKey
-                   ):
-        # type: (...) -> _Signature
+                   message_hash: bytes,
+                   private_key: _PrivateKey,
+                   ) -> _Signature:
         validate_message_hash(message_hash)
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
@@ -79,7 +78,7 @@ class KeyAPI(LazyBackend):
             )
         return public_key
 
-    def private_key_to_public_key(self, private_key):
+    def private_key_to_public_key(self, private_key: _PrivateKey) -> _PublicKey:
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
                 "The `private_key` must be an instance of `eth_keys.datatypes.PrivateKey`"
