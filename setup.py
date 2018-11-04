@@ -24,6 +24,7 @@ setup(
     py_modules=['eth_keys'],
     license="MIT",
     zip_safe=False,
+    package_data={'eth-keys': ['py.typed']},
     keywords='ethereum',
     packages=find_packages(exclude=["tests", "tests.*"]),
     classifiers=[
