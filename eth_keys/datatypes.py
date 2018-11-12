@@ -3,7 +3,13 @@ from __future__ import absolute_import
 import codecs
 import collections
 import sys
-from typing import (Any, Optional, Tuple, Union, Type)  # noqa: F401
+from typing import (    # noqa: F401
+    Any,
+    Tuple,
+    Union,
+    Type,
+    TYPE_CHECKING,
+)
 
 from eth_utils import (
     big_endian_to_int,
@@ -39,11 +45,7 @@ from eth_keys.validation import (
     validate_signature_bytes,
 )
 
-
-# Workaround for import cycles caused by type annotations:
-# http://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
-MYPY = False
-if MYPY:
+if TYPE_CHECKING:
     from eth_keys.backends.base import BaseECCBackend  # noqa: F401
 
 
@@ -83,21 +85,21 @@ class LazyBackend:
 
         self.backend = backend
 
-    _backend = None  # type: bytes
+    _backend = None  # type: BaseECCBackend
 
     @property
-    def backend(self):
+    def backend(self) -> 'BaseECCBackend':
         if self._backend is None:
             return self.get_backend()
         else:
             return self._backend
 
     @backend.setter
-    def backend(self, value):
+    def backend(self, value: 'BaseECCBackend') -> None:
         self._backend = value
 
     @classmethod
-    def get_backend(cls, *args, **kwargs):
+    def get_backend(cls, *args: Any, **kwargs: Any) -> 'BaseECCBackend':
         from eth_keys.backends import get_backend
         return get_backend(*args, **kwargs)
 
@@ -335,8 +337,7 @@ class Signature(ByteString, LazyBackend):
         vb = int_to_byte(self.v)
         rb = pad32(int_to_big_endian(self.r))
         sb = pad32(int_to_big_endian(self.s))
-        # FIXME: Enable type checking once we have type annotations in eth_utils
-        return b''.join((rb, sb, vb))  # type: ignore
+        return b''.join((rb, sb, vb))
 
     def __str__(self) -> str:
         return self.to_hex()
