@@ -15,7 +15,7 @@ pip install eth-keys
 ## Development
 
 ```sh
-pip install -e . -r requirements-dev.txt
+pip install -e .[dev]
 ```
 
 

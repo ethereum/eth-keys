@@ -1,13 +1,11 @@
 from typing import Any
 
-from cytoolz import (
-    curry,
-)
 
 from eth_utils import (
     is_bytes,
     is_integer,
 )
+from eth_utils.toolz import curry
 
 from eth_keys.constants import (
     SECPK1_N,

@@ -6,6 +6,36 @@ from setuptools import (
 )
 
 
+deps = {
+    'eth-keys': [
+        "eth-utils>=1.3.0,<2.0.0",
+    ],
+    'test': [
+        'pytest==3.2.2',
+        'hypothesis==3.30.0',
+        "eth-hash[pysha3];implementation_name=='cpython'",
+        "eth-hash[pycryptodome];implementation_name=='pypy'",
+    ],
+    'lint': [
+        'flake8==3.0.4',
+        'mypy<0.600',
+    ],
+    'dev': [
+        'tox==2.7.0',
+        'bumpversion==0.5.3',
+        'twine',
+    ],
+}
+
+deps['dev'] = (
+    deps['dev'] +
+    deps['eth-keys'] +
+    deps['lint'] +
+    deps['test']
+)
+
+print(deps)
+
 setup(
     name='eth-keys',
     # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
@@ -17,11 +47,9 @@ setup(
     url='https://github.com/ethereum/eth-keys',
     include_package_data=True,
     setup_requires=['setuptools-markdown'],
-    install_requires=[
-        "eth-utils>=1.0.0,<2.0.0",
-        "cytoolz>=0.9.0,<1.0.0",
-    ],
+    install_requires=deps['eth-keys'],
     py_modules=['eth_keys'],
+    extras_require=deps,
     license="MIT",
     zip_safe=False,
     package_data={'eth-keys': ['py.typed']},
