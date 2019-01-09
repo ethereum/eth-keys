@@ -34,8 +34,6 @@ deps['dev'] = (
     deps['test']
 )
 
-print(deps)
-
 setup(
     name='eth-keys',
     # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
