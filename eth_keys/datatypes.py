@@ -20,6 +20,9 @@ from eth_utils import (
     to_checksum_address,
     to_normalized_address,
 )
+from eth_utils.typing import (
+    ChecksumAddress,
+)
 
 from eth_keys.utils.address import (
     public_key_bytes_to_address,
@@ -208,7 +211,7 @@ class PublicKey(BaseKey, LazyBackend):
     #
     # Ethereum address conversions
     #
-    def to_checksum_address(self) -> bytes:
+    def to_checksum_address(self) -> ChecksumAddress:
         return to_checksum_address(public_key_bytes_to_address(self.to_bytes()))
 
     def to_address(self) -> str:
