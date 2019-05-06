@@ -6,6 +6,8 @@ from .ecdsa import (
     ecdsa_raw_recover,
     ecdsa_raw_sign,
     private_key_to_public_key,
+    compress_public_key,
+    decompress_public_key,
 )
 
 from eth_keys.backends.base import BaseECCBackend
@@ -35,3 +37,11 @@ class NativeECCBackend(BaseECCBackend):
         public_key_bytes = private_key_to_public_key(private_key.to_bytes())
         public_key = PublicKey(public_key_bytes, backend=self)
         return public_key
+
+    def decompress_public_key_bytes(self,
+                                    compressed_public_key_bytes: bytes) -> bytes:
+        return decompress_public_key(compressed_public_key_bytes)
+
+    def compress_public_key_bytes(self,
+                                  uncompressed_public_key_bytes: bytes) -> bytes:
+        return compress_public_key(uncompressed_public_key_bytes)
