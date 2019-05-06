@@ -56,10 +56,20 @@ def validate_message_hash(value: Any) -> None:
         raise ValidationError("Unexpected signature format.  Must be length 65 byte string")
 
 
-def validate_public_key_bytes(value: Any) -> None:
+def validate_uncompressed_public_key_bytes(value: Any) -> None:
     validate_bytes(value)
     if len(value) != 64:
-        raise ValidationError("Unexpected public key format.  Must be length 64 byte string")
+        raise ValidationError(
+            "Unexpected uncompressed public key format.  Must be length 64 byte string"
+        )
+
+
+def validate_compressed_public_key_bytes(value: Any) -> None:
+    validate_bytes(value)
+    if len(value) != 33:
+        raise ValidationError(
+            "Unexpected compressed public key format.  Must be length 33 byte string"
+        )
 
 
 def validate_private_key_bytes(value: Any) -> None:

@@ -11,6 +11,8 @@ from eth_keys.exceptions import (
 )
 from eth_keys.validation import (
     validate_message_hash,
+    validate_compressed_public_key_bytes,
+    validate_uncompressed_public_key_bytes,
 )
 
 
@@ -86,6 +88,16 @@ class KeyAPI(LazyBackend):
                 "an instance of `eth_keys.datatypes.PublicKey`"
             )
         return public_key
+
+    def decompress_public_key_bytes(self,
+                                    compressed_public_key_bytes: bytes) -> bytes:
+        validate_compressed_public_key_bytes(compressed_public_key_bytes)
+        return self.backend.decompress_public_key_bytes(compressed_public_key_bytes)
+
+    def compress_public_key_bytes(self,
+                                  uncompressed_public_key_bytes: bytes) -> bytes:
+        validate_uncompressed_public_key_bytes(uncompressed_public_key_bytes)
+        return self.backend.compress_public_key_bytes(uncompressed_public_key_bytes)
 
 
 # This creates an easy to import backend which will lazily fetch whatever
