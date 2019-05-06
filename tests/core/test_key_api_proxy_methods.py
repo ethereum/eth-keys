@@ -67,3 +67,15 @@ def test_key_api_ecdsa_recover_validation(key_api, signature, public_key):
         key_api.ecdsa_recover(MSG, signature)
 
     assert key_api.ecdsa_recover(MSGHASH, signature) == public_key
+
+def test_key_api_decompress_public_key_validation(key_api, public_key):
+    compressed_bytes = public_key.to_compressed_bytes()
+    uncompressed_bytes = public_key.to_bytes()
+
+    with pytest.raises(ValidationError):
+        key_api.decompress_public_key_bytes(uncompressed_bytes)
+    with pytest.raises(ValidationError):
+        key_api.compress_public_key_bytes(compressed_bytes)
+
+    assert key_api.decompress_public_key_bytes(compressed_bytes) == uncompressed_bytes
+    assert key_api.compress_public_key_bytes(uncompressed_bytes) == compressed_bytes

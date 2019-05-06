@@ -55,3 +55,17 @@ def test_ecdsa_recover(key_api, key_fixture):
     public_key = key_api.PublicKey(key_fixture['pubkey'])
 
     assert key_api.ecdsa_recover(MSGHASH, signature) == public_key
+
+
+def test_decompress_public_key_bytes(key_api, key_fixture):
+    compressed = key_fixture['compressed_pubkey']
+    uncompressed = key_fixture['pubkey']
+
+    assert key_api.decompress_public_key_bytes(compressed) == uncompressed
+
+
+def compress_public_key_bytes(key_api, key_fixture):
+    uncompressed = key_fixture['pubkey']
+    compressed = key_fixture['compressed_pubkey']
+
+    assert key_api.compress_public_key_bytes(uncompressed) == compressed

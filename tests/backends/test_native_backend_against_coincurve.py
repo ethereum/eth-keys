@@ -157,3 +157,62 @@ def test_coincurve_to_native_invalid_signatures(message_hash,
     public_key_b = backend_b.ecdsa_recover(message_hash, signature_a)
 
     assert public_key_b == public_key_a
+
+
+@given(
+    private_key_bytes=private_key_st,
+    direction=st.one_of(
+        st.just('coincurve-to-native'),
+        st.just('native-to-coincurve'),
+    ),
+)
+def test_public_key_compression_is_equal(private_key_bytes,
+                                         direction,
+                                         native_key_api,
+                                         coincurve_key_api):
+    if direction == 'coincurve-to-native':
+        backend_a = coincurve_key_api
+        backend_b = native_key_api
+    elif direction == 'native-to-coincurve':
+        backend_b = coincurve_key_api
+        backend_a = native_key_api
+    else:
+        assert False, "invariant"
+
+    public_key_a = backend_a.PrivateKey(private_key_bytes).public_key
+    public_key_b = backend_b.PrivateKey(private_key_bytes).public_key
+
+    compressed_public_key_a = public_key_a.to_compressed_bytes()
+    compressed_public_key_b = public_key_b.to_compressed_bytes()
+
+    assert compressed_public_key_a == compressed_public_key_b
+
+
+@given(
+    private_key_bytes=private_key_st,
+    direction=st.one_of(
+        st.just('coincurve-to-native'),
+        st.just('native-to-coincurve'),
+    ),
+)
+def test_public_key_decompression_is_equal(private_key_bytes,
+                                           direction,
+                                           native_key_api,
+                                           coincurve_key_api):
+
+    if direction == 'coincurve-to-native':
+        backend_a = coincurve_key_api
+        backend_b = native_key_api
+    elif direction == 'native-to-coincurve':
+        backend_b = coincurve_key_api
+        backend_a = native_key_api
+    else:
+        assert False, "invariant"
+
+    public_key_template = backend_a.PrivateKey(private_key_bytes).public_key
+    compressed_public_key = public_key_template.to_compressed_bytes()
+
+    public_key_a = backend_a.PublicKey.from_compressed_bytes(compressed_public_key)
+    public_key_b = backend_b.PublicKey.from_compressed_bytes(compressed_public_key)
+
+    assert public_key_a == public_key_b
