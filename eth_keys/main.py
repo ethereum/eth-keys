@@ -89,16 +89,6 @@ class KeyAPI(LazyBackend):
             )
         return public_key
 
-    def decompress_public_key_bytes(self,
-                                    compressed_public_key_bytes: bytes) -> bytes:
-        validate_compressed_public_key_bytes(compressed_public_key_bytes)
-        return self.backend.decompress_public_key_bytes(compressed_public_key_bytes)
-
-    def compress_public_key_bytes(self,
-                                  uncompressed_public_key_bytes: bytes) -> bytes:
-        validate_uncompressed_public_key_bytes(uncompressed_public_key_bytes)
-        return self.backend.compress_public_key_bytes(uncompressed_public_key_bytes)
-
 
 # This creates an easy to import backend which will lazily fetch whatever
 # backend has been configured at runtime (as opposed to import or instantiation time).
