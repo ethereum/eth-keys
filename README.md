@@ -189,9 +189,18 @@ Each of these objects has all of the following APIs.
 
 The `PublicKey` class takes a single argument which must be a bytes string with length 64.
 
-> Note that some libraries prefix the byte serialized public key with a leading `\x04` byte which must be removed before use with the `PublicKey` object.
+> Note that there are two other common formats for public keys: 65 bytes with a leading `\x04` byte
+> and 33 bytes starting with either `\x02` or `\x03`. To use the former with the `PublicKey` object,
+> remove the first byte. For the latter, refer to `PublicKey.from_compressed_bytes`.
 
 The following methods are available:
+
+
+#### `PublicKey.from_compressed_bytes(compressed_bytes) -> PublicKey`
+
+This `classmethod` returns a new `PublicKey` instance computed from its compressed representation.
+
+* `compressed_bytes` **must** be a byte string of length 33 starting with `\x02` or `\x03`.
 
 
 #### `PublicKey.from_private(private_key) -> PublicKey`
@@ -227,6 +236,11 @@ for the given message.
 
 Same as `PublicKey.verify_msg` except that `message_hash` should be the Keccak
 hash of the `message`.
+
+
+#### `PublicKey.to_compressed_bytes() -> bytes`
+
+Returns the compressed representation of this public key.
 
 
 #### `PublicKey.to_address() -> text`
