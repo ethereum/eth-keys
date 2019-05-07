@@ -7,32 +7,22 @@ from hypothesis import (
 )
 
 from eth_utils import (
-    int_to_big_endian,
     keccak,
 )
 
 from eth_keys.exceptions import (
     BadSignature,
 )
-from eth_keys.utils.padding import (
-    pad32,
-)
 
 from eth_keys import KeyAPI
 from eth_keys.backends import CoinCurveECCBackend
 from eth_keys.backends import NativeECCBackend
-from eth_keys.constants import (
-    SECPK1_N,
+
+from strategies import (
+    private_key_st,
+    message_hash_st,
+    signature_st,
 )
-
-
-private_key_st = st.integers(min_value=1, max_value=SECPK1_N).map(
-    int_to_big_endian,
-).map(pad32)
-
-
-message_hash_st = st.binary(min_size=32, max_size=32)
-signature_st = st.binary(min_size=65, max_size=65)
 
 
 MSG = b'message'
