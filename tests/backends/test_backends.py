@@ -69,14 +69,16 @@ def test_decompress_public_key_bytes(key_api, key_fixture):
     compressed = key_fixture['compressed_pubkey']
     uncompressed = key_fixture['pubkey']
 
-    assert key_api.decompress_public_key_bytes(compressed) == uncompressed
+    key_from_compressed = key_api.PublicKey.from_compressed_bytes(compressed)
+    assert key_from_compressed.to_bytes() == uncompressed
 
 
 def test_compress_public_key_bytes(key_api, key_fixture):
     uncompressed = key_fixture['pubkey']
     compressed = key_fixture['compressed_pubkey']
 
-    assert key_api.compress_public_key_bytes(uncompressed) == compressed
+    key_from_uncompressed = key_api.PublicKey(uncompressed)
+    assert key_from_uncompressed.to_compressed_bytes() == compressed
 
 
 @given(
@@ -84,12 +86,8 @@ def test_compress_public_key_bytes(key_api, key_fixture):
 )
 def test_compress_decompress_inversion(key_api, private_key_bytes):
     private_key = key_api.PrivateKey(private_key_bytes)
-    public_key = private_key.public_key
-    uncompressed = public_key.to_bytes()
-    compressed = public_key.to_compressed_bytes()
 
-    compress = key_api.compress_public_key_bytes
-    decompress = key_api.decompress_public_key_bytes
-
-    assert decompress(compress(uncompressed)) == uncompressed
-    assert compress(decompress(compressed)) == compressed
+    original = private_key.public_key
+    compressed_bytes = original.to_compressed_bytes()
+    decompressed = key_api.PublicKey.from_compressed_bytes(compressed_bytes)
+    assert decompressed == original
