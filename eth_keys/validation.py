@@ -1,7 +1,7 @@
 from typing import Any
 
-
 from eth_utils import (
+    encode_hex,
     is_bytes,
     is_integer,
 )
@@ -50,35 +50,47 @@ def validate_lte(value: Any, maximum: int) -> None:
 validate_lt_secpk1n = validate_lte(maximum=SECPK1_N - 1)
 
 
+def validate_bytes_length(value: bytes, expected_length: int, name: str) -> None:
+    actual_length = len(value)
+    if actual_length != expected_length:
+        raise ValidationError(
+            "Unexpected {name} length: Expected {expected_length}, but got {actual_length} "
+            "bytes".format(
+                name=name,
+                expected_length=expected_length,
+                actual_length=actual_length,
+            )
+        )
+
+
 def validate_message_hash(value: Any) -> None:
     validate_bytes(value)
-    if len(value) != 32:
-        raise ValidationError("Unexpected signature format.  Must be length 65 byte string")
+    validate_bytes_length(value, 32, "message hash")
 
 
 def validate_uncompressed_public_key_bytes(value: Any) -> None:
     validate_bytes(value)
-    if len(value) != 64:
-        raise ValidationError(
-            "Unexpected uncompressed public key format.  Must be length 64 byte string"
-        )
+    validate_bytes_length(value, 64, "uncompressed public key")
 
 
 def validate_compressed_public_key_bytes(value: Any) -> None:
     validate_bytes(value)
-    if len(value) != 33:
+    validate_bytes_length(value, 33, "compressed public key")
+    first_byte = value[0:1]
+    if first_byte not in (b"\x02", b"\x03"):
         raise ValidationError(
-            "Unexpected compressed public key format.  Must be length 33 byte string"
+            "Unexpected compressed public key format: Must start with 0x02 or 0x03, but starts "
+            "with {first_byte}".format(
+                first_byte=encode_hex(first_byte),
+            )
         )
 
 
 def validate_private_key_bytes(value: Any) -> None:
     validate_bytes(value)
-    if len(value) != 32:
-        raise ValidationError("Unexpected private key format.  Must be length 32 byte string")
+    validate_bytes_length(value, 32, "private key")
 
 
 def validate_signature_bytes(value: Any) -> None:
     validate_bytes(value)
-    if len(value) != 65:
-        raise ValidationError("Unexpected signature format.  Must be length 65 byte string")
+    validate_bytes_length(value, 65, "signature")
