@@ -2,12 +2,20 @@ import os
 
 import pytest
 
+from hypothesis import (
+    given,
+)
+
 from eth_keys import KeyAPI
 from eth_keys.backends import CoinCurveECCBackend
 from eth_keys.backends import NativeECCBackend
 
 from eth_utils import (
     keccak,
+)
+
+from strategies import (
+    private_key_st,
 )
 
 
@@ -64,8 +72,24 @@ def test_decompress_public_key_bytes(key_api, key_fixture):
     assert key_api.decompress_public_key_bytes(compressed) == uncompressed
 
 
-def compress_public_key_bytes(key_api, key_fixture):
+def test_compress_public_key_bytes(key_api, key_fixture):
     uncompressed = key_fixture['pubkey']
     compressed = key_fixture['compressed_pubkey']
 
     assert key_api.compress_public_key_bytes(uncompressed) == compressed
+
+
+@given(
+    private_key_bytes=private_key_st,
+)
+def test_compress_decompress_inversion(key_api, private_key_bytes):
+    private_key = key_api.PrivateKey(private_key_bytes)
+    public_key = private_key.public_key
+    uncompressed = public_key.to_bytes()
+    compressed = public_key.to_compressed_bytes()
+
+    compress = key_api.compress_public_key_bytes
+    decompress = key_api.decompress_public_key_bytes
+
+    assert decompress(compress(uncompressed)) == uncompressed
+    assert compress(decompress(compressed)) == compressed
