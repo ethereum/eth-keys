@@ -5,6 +5,7 @@ from typing import Optional  # noqa: F401
 from .ecdsa import (
     ecdsa_raw_recover,
     ecdsa_raw_sign,
+    ecdsa_raw_verify,
     private_key_to_public_key,
     compress_public_key,
     decompress_public_key,
@@ -12,6 +13,8 @@ from .ecdsa import (
 
 from eth_keys.backends.base import BaseECCBackend
 from eth_keys.datatypes import (  # noqa: F401
+    BaseSignature,
+    NonRecoverableSignature,
     PrivateKey,
     PublicKey,
     Signature,
@@ -25,6 +28,20 @@ class NativeECCBackend(BaseECCBackend):
         signature_vrs = ecdsa_raw_sign(msg_hash, private_key.to_bytes())
         signature = Signature(vrs=signature_vrs, backend=self)
         return signature
+
+    def ecdsa_sign_non_recoverable(self,
+                                   msg_hash: bytes,
+                                   private_key: PrivateKey) -> NonRecoverableSignature:
+        signature_vrs = ecdsa_raw_sign(msg_hash, private_key.to_bytes())
+        signature_rs = signature_vrs[1:]
+        signature = NonRecoverableSignature(rs=signature_rs, backend=self)
+        return signature
+
+    def ecdsa_verify(self,
+                     msg_hash: bytes,
+                     signature: BaseSignature,
+                     public_key: PublicKey) -> bool:
+        return ecdsa_raw_verify(msg_hash, signature.rs, public_key.to_bytes())
 
     def ecdsa_recover(self,
                       msg_hash: bytes,

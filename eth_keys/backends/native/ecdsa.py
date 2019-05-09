@@ -120,14 +120,11 @@ def ecdsa_raw_sign(msg_hash: bytes,
 
 
 def ecdsa_raw_verify(msg_hash: bytes,
-                     vrs: Tuple[int, int, int],
+                     rs: Tuple[int, int],
                      public_key_bytes: bytes) -> bool:
     raw_public_key = decode_public_key(public_key_bytes)
 
-    v, r, s = vrs
-    v += 27
-    if not (27 <= v <= 34):
-        raise BadSignature("Invalid Signature")
+    r, s = rs
 
     w = inv(s, N)
     z = big_endian_to_int(msg_hash)
