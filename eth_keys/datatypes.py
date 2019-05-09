@@ -1,5 +1,9 @@
 from __future__ import absolute_import
 
+from abc import (
+    ABC,
+    abstractmethod,
+)
 import codecs
 import collections
 import sys
@@ -13,6 +17,7 @@ from typing import (    # noqa: F401
 
 from eth_utils import (
     big_endian_to_int,
+    encode_hex,
     int_to_big_endian,
     is_bytes,
     is_string,
@@ -46,7 +51,8 @@ from eth_keys.validation import (
     validate_private_key_bytes,
     validate_compressed_public_key_bytes,
     validate_uncompressed_public_key_bytes,
-    validate_signature_bytes,
+    validate_recoverable_signature_bytes,
+    validate_non_recoverable_signature_bytes,
 )
 
 if TYPE_CHECKING:
@@ -259,111 +265,64 @@ class PrivateKey(BaseKey, LazyBackend):
     def sign_msg_hash(self, message_hash: bytes) -> 'Signature':
         return self.backend.ecdsa_sign(message_hash, self)
 
+    def sign_msg_non_recoverable(self, message: bytes) -> 'NonRecoverableSignature':
+        message_hash = keccak(message)
+        return self.sign_msg_hash_non_recoverable(message_hash)
 
-class Signature(ByteString, LazyBackend):
-    _v = None  # type: int
+    def sign_msg_hash_non_recoverable(self, message_hash: bytes) -> 'NonRecoverableSignature':
+        return self.backend.ecdsa_sign_non_recoverable(message_hash, self)
+
+
+class BaseSignature(ByteString, LazyBackend, ABC):
     _r = None  # type: int
     _s = None  # type: int
 
     def __init__(self,
-                 signature_bytes: bytes = None,
-                 vrs: Tuple[int, int, int] = None,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
+                 rs: Tuple[int, int],
+                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None
                  ) -> None:
-        if bool(signature_bytes) is bool(vrs):
-            raise TypeError("You must provide one of `signature_bytes` or `vrs`")
-        elif signature_bytes:
-            validate_signature_bytes(signature_bytes)
+        for value in rs:
             try:
-                self.r = big_endian_to_int(signature_bytes[0:32])
-                self.s = big_endian_to_int(signature_bytes[32:64])
-                self.v = ord(signature_bytes[64:65])
-            except ValidationError as err:
-                raise BadSignature(str(err))
-        elif vrs:
-            v, r, s, = vrs
-            try:
-                self.v = v
-                self.r = r
-                self.s = s
-            except ValidationError as err:
-                raise BadSignature(str(err))
-        else:
-            raise TypeError("Invariant: unreachable code path")
+                validate_integer(value)
+                validate_gte(value, 0)
+                validate_lt_secpk1n(value)
+            except ValidationError as error:
+                raise BadSignature(error) from error
 
+        self._r, self._s = rs
         super().__init__(backend=backend)
 
-    #
-    # v
-    #
-    @property
-    def v(self) -> int:
-        return self._v
 
-    @v.setter
-    def v(self, value: int) -> None:
-        validate_integer(value)
-        validate_gte(value, minimum=0)
-        validate_lte(value, maximum=1)
-
-        self._v = value
-
-    #
-    # r
-    #
     @property
     def r(self) -> int:
         return self._r
 
-    @r.setter
-    def r(self, value: int) -> None:
-        validate_integer(value)
-        validate_gte(value, 0)
-        validate_lt_secpk1n(value)
-
-        self._r = value
-
-    #
-    # s
-    #
     @property
     def s(self) -> int:
         return self._s
 
-    @s.setter
-    def s(self, value: int) -> None:
-        validate_integer(value)
-        validate_gte(value, 0)
-        validate_lt_secpk1n(value)
-
-        self._s = value
-
     @property
-    def vrs(self) -> Tuple[int, int, int]:
-        return (self.v, self.r, self.s)
+    def rs(self) -> Tuple[int, int]:
+        return (self.r, self.s)
+
+    @abstractmethod
+    def to_bytes(self) -> bytes:
+        pass
+
+    def __bytes__(self) -> bytes:
+        return self.to_bytes()
 
     def to_hex(self) -> str:
-        # Need the 'type: ignore' comment below because of
-        # https://github.com/python/typeshed/issues/300
-        return '0x' + codecs.decode(codecs.encode(self.to_bytes(), 'hex'), 'ascii')  # type: ignore
-
-    def to_bytes(self) -> bytes:
-        return self.__bytes__()
+        return encode_hex(self.to_bytes())
 
     def __hash__(self) -> int:
         return big_endian_to_int(keccak(self.to_bytes()))
-
-    def __bytes__(self) -> bytes:
-        vb = int_to_byte(self.v)
-        rb = pad32(int_to_big_endian(self.r))
-        sb = pad32(int_to_big_endian(self.s))
-        return b''.join((rb, sb, vb))
 
     def __str__(self) -> str:
         return self.to_hex()
 
     def __len__(self) -> int:
-        return 65
+        return len(bytes(self))
 
     def __eq__(self, other: Any) -> bool:
         if hasattr(other, 'to_bytes'):
@@ -381,6 +340,15 @@ class Signature(ByteString, LazyBackend):
     def __repr__(self) -> str:
         return "'{0}'".format(self.to_hex())
 
+    def __index__(self) -> int:
+        return self.__int__()
+
+    def __hex__(self) -> str:
+        return self.to_hex()
+
+    def __int__(self) -> int:
+        return big_endian_to_int(self.to_bytes())
+
     def verify_msg(self,
                    message: bytes,
                    public_key: PublicKey) -> bool:
@@ -392,6 +360,74 @@ class Signature(ByteString, LazyBackend):
                         public_key: PublicKey) -> bool:
         return self.backend.ecdsa_verify(message_hash, self, public_key)
 
+
+class Signature(BaseSignature):
+    _v = None  # type: int
+
+    def __init__(self,
+                 signature_bytes: bytes = None,
+                 vrs: Tuple[int, int, int] = None,
+                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
+                 ) -> None:
+        if bool(signature_bytes) is bool(vrs):
+            raise TypeError("You must provide one of `signature_bytes` or `vrs`")
+        elif signature_bytes:
+            validate_recoverable_signature_bytes(signature_bytes)
+            r = big_endian_to_int(signature_bytes[0:32])
+            s = big_endian_to_int(signature_bytes[32:64])
+            v = ord(signature_bytes[64:65])
+        elif vrs:
+            v, r, s, = vrs
+        else:
+            raise TypeError("Invariant: unreachable code path")
+
+        super().__init__(rs=(r, s), backend=backend)
+        try:
+            self.v = v
+        except ValidationError as error:
+            raise BadSignature(str(error)) from error
+
+    #
+    # v
+    #
+    @property
+    def v(self) -> int:
+        return self._v
+
+    @v.setter
+    def v(self, value: int) -> None:
+        validate_integer(value)
+        validate_gte(value, minimum=0)
+        validate_lte(value, maximum=1)
+
+        self._v = value
+
+    @BaseSignature.r.setter
+    def r(self, value: int) -> None:
+        validate_integer(value)
+        validate_gte(value, 0)
+        validate_lt_secpk1n(value)
+
+        self._r = value
+
+    @BaseSignature.s.setter
+    def s(self, value: int) -> None:
+        validate_integer(value)
+        validate_gte(value, 0)
+        validate_lt_secpk1n(value)
+
+        self._s = value
+
+    @property
+    def vrs(self) -> Tuple[int, int, int]:
+        return (self.v, self.r, self.s)
+
+    def to_bytes(self) -> bytes:
+        vb = int_to_byte(self.v)
+        rb = pad32(int_to_big_endian(self.r))
+        sb = pad32(int_to_big_endian(self.s))
+        return b''.join((rb, sb, vb))
+
     def recover_public_key_from_msg(self, message: bytes) -> PublicKey:
         message_hash = keccak(message)
         return self.recover_public_key_from_msg_hash(message_hash)
@@ -399,14 +435,32 @@ class Signature(ByteString, LazyBackend):
     def recover_public_key_from_msg_hash(self, message_hash: bytes) -> PublicKey:
         return self.backend.ecdsa_recover(message_hash, self)
 
-    def __index__(self) -> int:
-        return self.__int__()
+    def to_non_recoverable_signature(self) -> 'NonRecoverableSignature':
+        return NonRecoverableSignature(rs=self.rs)
 
-    def __hex__(self) -> str:
-        if sys.version_info[0] == 2:
-            return codecs.encode(self.to_hex(), 'ascii')
+
+class NonRecoverableSignature(BaseSignature):
+
+    def __init__(self,
+                 signature_bytes: bytes = None,
+                 rs: Tuple[int, int] = None,
+                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
+                 ) -> None:
+        if signature_bytes is None and rs is None:
+            raise TypeError("You must provide one of `signature_bytes` or `vr`")
+        elif signature_bytes:
+            validate_non_recoverable_signature_bytes(signature_bytes)
+            r = big_endian_to_int(signature_bytes[0:32])
+            s = big_endian_to_int(signature_bytes[32:64])
+        elif rs:
+            r, s = rs
         else:
-            return self.to_hex()
+            raise Exception("Invariant: unreachable code path")
 
-    def __int__(self) -> int:
-        return big_endian_to_int(self.to_bytes())
+        super().__init__(rs=(r, s), backend=backend)
+
+    def to_bytes(self):
+        return b''.join(
+            pad32(int_to_big_endian(value))
+            for value in self.rs
+        )

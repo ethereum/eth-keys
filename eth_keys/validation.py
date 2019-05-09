@@ -91,6 +91,11 @@ def validate_private_key_bytes(value: Any) -> None:
     validate_bytes_length(value, 32, "private key")
 
 
-def validate_signature_bytes(value: Any) -> None:
+def validate_recoverable_signature_bytes(value: Any) -> None:
     validate_bytes(value)
-    validate_bytes_length(value, 65, "signature")
+    validate_bytes_length(value, 65, "recoverable signature")
+
+
+def validate_non_recoverable_signature_bytes(value: Any) -> None:
+    validate_bytes(value)
+    validate_bytes_length(value, 64, "non recoverable signature")
