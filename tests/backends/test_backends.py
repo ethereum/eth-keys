@@ -51,6 +51,13 @@ def test_ecdsa_sign(key_api, key_fixture):
     assert key_api.ecdsa_verify(MSGHASH, signature, private_key.public_key)
 
 
+def test_ecdsa_sign_non_recoverable(key_api, key_fixture):
+    private_key = key_api.PrivateKey(key_fixture['privkey'])
+    signature = key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key)
+
+    assert key_api.ecdsa_verify(MSGHASH, signature, private_key.public_key)
+
+
 def test_ecdsa_verify(key_api, key_fixture):
     signature = key_api.Signature(vrs=key_fixture['raw_sig'])
     public_key = key_api.PublicKey(key_fixture['pubkey'])

@@ -49,6 +49,16 @@ def test_key_api_ecdsa_sign_validation(key_api, private_key):
     assert signature.verify_msg_hash(MSGHASH, private_key.public_key)
 
 
+def test_key_api_ecdsa_sign_non_recoverable_validation(key_api, private_key):
+    with pytest.raises(ValidationError):
+        key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key.to_bytes())
+    with pytest.raises(ValidationError):
+        key_api.ecdsa_sign_non_recoverable(MSG, private_key)
+
+    signature = key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key)
+    assert signature.verify_msg_hash(MSGHASH, private_key.public_key)
+
+
 def test_key_api_ecdsa_verify_validation(key_api, signature, public_key):
     with pytest.raises(ValidationError):
         key_api.ecdsa_verify(MSGHASH, signature.to_bytes(), public_key)
