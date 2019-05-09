@@ -7,6 +7,8 @@ from eth_utils import (
 )
 
 from eth_keys.datatypes import (  # noqa: F401
+    BaseSignature,
+    NonRecoverableSignature,
     PrivateKey,
     PublicKey,
     Signature,
@@ -16,6 +18,9 @@ from eth_keys.exceptions import (
 )
 from eth_keys.validation import (
     validate_uncompressed_public_key_bytes,
+)
+from eth_keys.utils import (
+    der,
 )
 
 from .base import BaseECCBackend
@@ -51,6 +56,32 @@ class CoinCurveECCBackend(BaseECCBackend):
         )
         signature = Signature(signature_bytes, backend=self)
         return signature
+
+    def ecdsa_sign_non_recoverable(self,
+                                   msg_hash: bytes,
+                                   private_key: PrivateKey) -> NonRecoverableSignature:
+        private_key_bytes = private_key.to_bytes()
+
+        der_encoded_signature = self.keys.PrivateKey(private_key_bytes).sign(
+            msg_hash,
+            hasher=None,
+        )
+        rs = der.two_int_sequence_decoder(der_encoded_signature)
+
+        signature = NonRecoverableSignature(rs=rs, backend=self)
+        return signature
+
+    def ecdsa_verify(self,
+                     msg_hash: bytes,
+                     signature: BaseSignature,
+                     public_key: PublicKey) -> bool:
+        der_encoded_signature = der.two_int_sequence_encoder(signature.r, signature.s)
+        coincurve_public_key = self.keys.PublicKey(b"\x04" + public_key.to_bytes())
+        return coincurve_public_key.verify(
+            der_encoded_signature,
+            msg_hash,
+            hasher=None,
+        )
 
     def ecdsa_recover(self,
                       msg_hash: bytes,
