@@ -151,31 +151,17 @@ def test_coincurve_to_native_invalid_signatures(message_hash,
 
 @given(
     private_key_bytes=private_key_st,
-    direction=st.one_of(
-        st.just('coincurve-to-native'),
-        st.just('native-to-coincurve'),
-    ),
 )
 def test_public_key_compression_is_equal(private_key_bytes,
-                                         direction,
                                          native_key_api,
                                          coincurve_key_api):
-    if direction == 'coincurve-to-native':
-        backend_a = coincurve_key_api
-        backend_b = native_key_api
-    elif direction == 'native-to-coincurve':
-        backend_b = coincurve_key_api
-        backend_a = native_key_api
-    else:
-        assert False, "invariant"
+    native_public_key = native_key_api.PrivateKey(private_key_bytes).public_key
+    coincurve_public_key = coincurve_key_api.PrivateKey(private_key_bytes).public_key
 
-    public_key_a = backend_a.PrivateKey(private_key_bytes).public_key
-    public_key_b = backend_b.PrivateKey(private_key_bytes).public_key
+    native_compressed_public_key = native_public_key.to_compressed_bytes()
+    coincurve_compressed_public_key = coincurve_public_key.to_compressed_bytes()
 
-    compressed_public_key_a = public_key_a.to_compressed_bytes()
-    compressed_public_key_b = public_key_b.to_compressed_bytes()
-
-    assert compressed_public_key_a == compressed_public_key_b
+    assert native_compressed_public_key == coincurve_compressed_public_key
 
 
 @given(
