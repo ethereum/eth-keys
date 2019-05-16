@@ -14,6 +14,9 @@ from eth_keys.datatypes import (  # noqa: F401
 from eth_keys.exceptions import (
     BadSignature,
 )
+from eth_keys.validation import (
+    validate_uncompressed_public_key_bytes,
+)
 
 from .base import BaseECCBackend
 
@@ -79,6 +82,7 @@ class CoinCurveECCBackend(BaseECCBackend):
 
     def compress_public_key_bytes(self,
                                   uncompressed_public_key_bytes: bytes) -> bytes:
+        validate_uncompressed_public_key_bytes(uncompressed_public_key_bytes)
         point = (
             big_endian_to_int(uncompressed_public_key_bytes[:32]),
             big_endian_to_int(uncompressed_public_key_bytes[32:]),
