@@ -11,6 +11,8 @@ from eth_keys.exceptions import (
 )
 from eth_keys.validation import (
     validate_message_hash,
+    validate_compressed_public_key_bytes,
+    validate_uncompressed_public_key_bytes,
 )
 
 

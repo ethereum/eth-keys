@@ -44,7 +44,8 @@ from eth_keys.validation import (
     validate_lt_secpk1n,
     validate_lte,
     validate_private_key_bytes,
-    validate_public_key_bytes,
+    validate_compressed_public_key_bytes,
+    validate_uncompressed_public_key_bytes,
     validate_signature_bytes,
 )
 
@@ -162,10 +163,23 @@ class PublicKey(BaseKey, LazyBackend):
                  public_key_bytes: bytes,
                  backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
                  ) -> None:
-        validate_public_key_bytes(public_key_bytes)
+        validate_uncompressed_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
         super().__init__(backend=backend)
+
+    @classmethod
+    def from_compressed_bytes(cls,
+                              compressed_public_key_bytes: bytes,
+                              backend: 'BaseECCBackend' = None,
+                              ) -> 'PublicKey':
+        validate_compressed_public_key_bytes(compressed_public_key_bytes)
+
+        if backend is None:
+            backend = cls.get_backend()
+        uncompressed_key = backend.decompress_public_key_bytes(compressed_public_key_bytes)
+
+        return cls(uncompressed_key, backend)
 
     @classmethod
     def from_private(cls,
@@ -207,6 +221,9 @@ class PublicKey(BaseKey, LazyBackend):
                         signature: 'Signature',
                         ) -> bool:
         return self.backend.ecdsa_verify(message_hash, signature, self)
+
+    def to_compressed_bytes(self) -> bytes:
+        return self.backend.compress_public_key_bytes(self.to_bytes())
 
     #
     # Ethereum address conversions

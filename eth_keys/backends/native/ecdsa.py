@@ -60,6 +60,35 @@ def private_key_to_public_key(private_key_bytes: bytes) -> bytes:
     return public_key_bytes
 
 
+def compress_public_key(uncompressed_public_key_bytes: bytes) -> bytes:
+    x, y = decode_public_key(uncompressed_public_key_bytes)
+    if y % 2 == 0:
+        prefix = b"\x02"
+    else:
+        prefix = b"\x03"
+    return prefix + pad32(int_to_big_endian(x))
+
+
+def decompress_public_key(compressed_public_key_bytes: bytes) -> bytes:
+    if len(compressed_public_key_bytes) != 33:
+        raise ValueError("Invalid compressed public key")
+
+    prefix = compressed_public_key_bytes[0]
+    if prefix not in (2, 3):
+        raise ValueError("Invalid compressed public key")
+
+    x = big_endian_to_int(compressed_public_key_bytes[1:])
+    y_squared = (x**3 + A * x + B) % P
+    y_abs = pow(y_squared, ((P + 1) // 4), P)
+
+    if (prefix == 2 and y_abs & 1 == 1) or (prefix == 3 and y_abs & 1 == 0):
+        y = (-y_abs) % P
+    else:
+        y = y_abs
+
+    return encode_raw_public_key((x, y))
+
+
 def deterministic_generate_k(msg_hash: bytes,
                              private_key_bytes: bytes,
                              digest_fn: Callable[[], Any] = hashlib.sha256) -> int:

@@ -14,6 +14,9 @@ from eth_utils import (
 
 from eth_keys import KeyAPI
 from eth_keys.backends import NativeECCBackend
+from eth_keys.exceptions import (
+    ValidationError,
+)
 
 
 MSG = b'message'
@@ -123,3 +126,21 @@ def test_bytes_conversion(key_api, private_key):
     assert public_key.to_bytes() == public_key._raw_key
     assert private_key.to_bytes() == private_key._raw_key
     assert signature.to_bytes() == key_api.Signature(signature.to_bytes()).to_bytes()
+
+
+def test_compressed_bytes_conversion(key_api, private_key):
+    public_key = private_key.public_key
+    compressed_bytes = public_key.to_compressed_bytes()
+    assert len(compressed_bytes) == 33
+    assert key_api.PublicKey.from_compressed_bytes(compressed_bytes) == public_key
+
+
+def test_compressed_bytes_validation(key_api, private_key):
+    valid_key = private_key.public_key.to_compressed_bytes()
+
+    with pytest.raises(ValidationError):
+        key_api.PublicKey.from_compressed_bytes(valid_key + b"\x00")
+    with pytest.raises(ValidationError):
+        key_api.PublicKey.from_compressed_bytes(valid_key[:-1])
+    with pytest.raises(ValidationError):
+        key_api.PublicKey.from_compressed_bytes(b"\x04" + valid_key[1:])

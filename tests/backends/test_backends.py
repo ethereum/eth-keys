@@ -2,12 +2,20 @@ import os
 
 import pytest
 
+from hypothesis import (
+    given,
+)
+
 from eth_keys import KeyAPI
 from eth_keys.backends import CoinCurveECCBackend
 from eth_keys.backends import NativeECCBackend
 
 from eth_utils import (
     keccak,
+)
+
+from strategies import (
+    private_key_st,
 )
 
 
@@ -55,3 +63,31 @@ def test_ecdsa_recover(key_api, key_fixture):
     public_key = key_api.PublicKey(key_fixture['pubkey'])
 
     assert key_api.ecdsa_recover(MSGHASH, signature) == public_key
+
+
+def test_decompress_public_key_bytes(key_api, key_fixture):
+    compressed = key_fixture['compressed_pubkey']
+    uncompressed = key_fixture['pubkey']
+
+    key_from_compressed = key_api.PublicKey.from_compressed_bytes(compressed)
+    assert key_from_compressed.to_bytes() == uncompressed
+
+
+def test_compress_public_key_bytes(key_api, key_fixture):
+    uncompressed = key_fixture['pubkey']
+    compressed = key_fixture['compressed_pubkey']
+
+    key_from_uncompressed = key_api.PublicKey(uncompressed)
+    assert key_from_uncompressed.to_compressed_bytes() == compressed
+
+
+@given(
+    private_key_bytes=private_key_st,
+)
+def test_compress_decompress_inversion(key_api, private_key_bytes):
+    private_key = key_api.PrivateKey(private_key_bytes)
+
+    original = private_key.public_key
+    compressed_bytes = original.to_compressed_bytes()
+    decompressed = key_api.PublicKey.from_compressed_bytes(compressed_bytes)
+    assert decompressed == original
