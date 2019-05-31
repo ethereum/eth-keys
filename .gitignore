@@ -100,3 +100,6 @@ fabric.properties
 
 # test fixtures
 fixtures/*
+
+# editors
+*.swp
