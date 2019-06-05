@@ -72,11 +72,14 @@ def test_recover_from_public_key_class(key_api, private_key):
 
 
 def test_verify_from_public_key_obj(key_api, private_key):
-    signature = key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key)
+    non_recoverable_signature = key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key)
+    recoverable_signature = key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key)
+
     public_key = private_key.public_key
 
-    assert public_key.verify_msg_hash(MSGHASH, signature)
-    assert public_key.verify_msg(MSG, signature)
+    for signature in (recoverable_signature, non_recoverable_signature):
+        assert public_key.verify_msg_hash(MSGHASH, signature)
+        assert public_key.verify_msg(MSG, signature)
 
 
 def test_from_private_for_public_key_class(key_api, private_key):
