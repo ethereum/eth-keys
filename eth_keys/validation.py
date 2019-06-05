@@ -99,3 +99,15 @@ def validate_recoverable_signature_bytes(value: Any) -> None:
 def validate_non_recoverable_signature_bytes(value: Any) -> None:
     validate_bytes(value)
     validate_bytes_length(value, 64, "non recoverable signature")
+
+
+def validate_signature_v(value: int) -> None:
+    validate_integer(value)
+    validate_gte(value, minimum=0)
+    validate_lte(value, maximum=1)
+
+
+def validate_signature_r_or_s(value: int) -> None:
+    validate_integer(value)
+    validate_gte(value, 0)
+    validate_lt_secpk1n(value)
