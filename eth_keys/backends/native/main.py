@@ -32,9 +32,8 @@ class NativeECCBackend(BaseECCBackend):
     def ecdsa_sign_non_recoverable(self,
                                    msg_hash: bytes,
                                    private_key: PrivateKey) -> NonRecoverableSignature:
-        signature_vrs = ecdsa_raw_sign(msg_hash, private_key.to_bytes())
-        signature_rs = signature_vrs[1:]
-        signature = NonRecoverableSignature(rs=signature_rs, backend=self)
+        _, signature_r, signature_s = ecdsa_raw_sign(msg_hash, private_key.to_bytes())
+        signature = NonRecoverableSignature(rs=(signature_r, signature_s), backend=self)
         return signature
 
     def ecdsa_verify(self,
