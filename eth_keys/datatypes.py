@@ -44,15 +44,13 @@ from eth_keys.exceptions import (
     ValidationError,
 )
 from eth_keys.validation import (
-    validate_gte,
-    validate_integer,
-    validate_lt_secpk1n,
-    validate_lte,
     validate_private_key_bytes,
     validate_compressed_public_key_bytes,
     validate_uncompressed_public_key_bytes,
     validate_recoverable_signature_bytes,
     validate_non_recoverable_signature_bytes,
+    validate_signature_v,
+    validate_signature_r_or_s,
 )
 
 if TYPE_CHECKING:
@@ -283,15 +281,12 @@ class BaseSignature(ByteString, LazyBackend, ABC):
                  ) -> None:
         for value in rs:
             try:
-                validate_integer(value)
-                validate_gte(value, 0)
-                validate_lt_secpk1n(value)
+                validate_signature_r_or_s(value)
             except ValidationError as error:
                 raise BadSignature(error) from error
 
         self._r, self._s = rs
         super().__init__(backend=backend)
-
 
     @property
     def r(self) -> int:
@@ -396,26 +391,17 @@ class Signature(BaseSignature):
 
     @v.setter
     def v(self, value: int) -> None:
-        validate_integer(value)
-        validate_gte(value, minimum=0)
-        validate_lte(value, maximum=1)
-
+        validate_signature_v(value)
         self._v = value
 
     @BaseSignature.r.setter
     def r(self, value: int) -> None:
-        validate_integer(value)
-        validate_gte(value, 0)
-        validate_lt_secpk1n(value)
-
+        validate_signature_r_or_s(value)
         self._r = value
 
     @BaseSignature.s.setter
     def s(self, value: int) -> None:
-        validate_integer(value)
-        validate_gte(value, 0)
-        validate_lt_secpk1n(value)
-
+        validate_signature_r_or_s(value)
         self._s = value
 
     @property
