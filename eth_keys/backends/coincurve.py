@@ -78,6 +78,7 @@ class CoinCurveECCBackend(BaseECCBackend):
                      msg_hash: bytes,
                      signature: BaseSignature,
                      public_key: PublicKey) -> bool:
+        # coincurve rejects signatures with a high s, so convert to the equivalent low s form
         low_s = coerce_low_s(signature.s)
         der_encoded_signature = der.two_int_sequence_encoder(signature.r, low_s)
         coincurve_public_key = self.keys.PublicKey(b"\x04" + public_key.to_bytes())
