@@ -61,6 +61,9 @@ def test_ecdsa_sign(key_api, key_fixture):
 def test_ecdsa_sign_non_recoverable(key_api, key_fixture):
     private_key = key_api.PrivateKey(key_fixture['privkey'])
     signature = key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key)
+    non_recoverable_signature = key_api.ecdsa_sign_non_recoverable(MSGHASH, private_key)
+    assert non_recoverable_signature.r == signature.r
+    assert non_recoverable_signature.s == signature.s
 
     assert key_api.ecdsa_verify(MSGHASH, signature, private_key.public_key)
 
