@@ -22,6 +22,9 @@ from eth_keys.validation import (
 from eth_keys.utils import (
     der,
 )
+from eth_keys.utils.numeric import (
+    coerce_low_s,
+)
 
 from .base import BaseECCBackend
 
@@ -75,7 +78,8 @@ class CoinCurveECCBackend(BaseECCBackend):
                      msg_hash: bytes,
                      signature: BaseSignature,
                      public_key: PublicKey) -> bool:
-        der_encoded_signature = der.two_int_sequence_encoder(signature.r, signature.s)
+        low_s = coerce_low_s(signature.s)
+        der_encoded_signature = der.two_int_sequence_encoder(signature.r, low_s)
         coincurve_public_key = self.keys.PublicKey(b"\x04" + public_key.to_bytes())
         return coincurve_public_key.verify(
             der_encoded_signature,

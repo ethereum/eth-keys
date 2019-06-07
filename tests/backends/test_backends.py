@@ -9,6 +9,12 @@ from hypothesis import (
 from eth_keys import KeyAPI
 from eth_keys.backends import CoinCurveECCBackend
 from eth_keys.backends import NativeECCBackend
+from eth_keys.constants import (
+    SECPK1_N,
+)
+from eth_keys.utils.numeric import (
+    coerce_low_s,
+)
 
 from eth_utils import (
     keccak,
@@ -16,6 +22,7 @@ from eth_utils import (
 
 from strategies import (
     private_key_st,
+    message_hash_st,
 )
 
 
@@ -98,3 +105,17 @@ def test_compress_decompress_inversion(key_api, private_key_bytes):
     compressed_bytes = original.to_compressed_bytes()
     decompressed = key_api.PublicKey.from_compressed_bytes(compressed_bytes)
     assert decompressed == original
+
+
+@given(
+    private_key_bytes=private_key_st,
+    message_hash=message_hash_st,
+)
+def test_signatures_with_high_s(key_api, private_key_bytes, message_hash):
+    private_key = key_api.PrivateKey(private_key_bytes)
+    low_s_signature = private_key.sign_msg_hash(message_hash)
+    assert coerce_low_s(low_s_signature.s) == low_s_signature.s
+    high_s = -low_s_signature.s % SECPK1_N
+    assert coerce_low_s(high_s) == low_s_signature.s
+    high_s_signature = key_api.Signature(vrs=(low_s_signature.v, low_s_signature.r, high_s))
+    assert key_api.ecdsa_verify(message_hash, high_s_signature, private_key.public_key)
