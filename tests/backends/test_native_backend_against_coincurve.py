@@ -104,11 +104,13 @@ def test_native_to_coincurve_recover(private_key_bytes,
     else:
         assert False, "invariant"
 
-    pk_a = backend_a.PrivateKey(private_key_bytes)
-    signature_a = backend_a.ecdsa_sign(message_hash, pk_a)
+    private_key_a = backend_a.PrivateKey(private_key_bytes)
+    public_key_a = private_key_a.public_key
+    signature_a = backend_a.ecdsa_sign(message_hash, private_key_a)
 
     public_key_b = backend_b.ecdsa_recover(message_hash, signature_a)
-    assert public_key_b == pk_a.public_key
+    assert public_key_b == public_key_a
+    assert backend_b.ecdsa_verify(message_hash, signature_a, public_key_b)
 
 
 @given(
