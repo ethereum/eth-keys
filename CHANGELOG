@@ -1,4 +1,13 @@
-0.1.0
------
+v0.2.4
+------
+
+Released 2019-06-11
+
+- Support for high-s signatures (bugfix for backwards compatibility) -- see
+  https://github.com/ethereum/eth-keys/pull/62
+- Stricter type checking
+
+v0.1.0
+------
 
 Initial release
