@@ -12,6 +12,7 @@ deps = {
     ],
     'eth-keys': [
         "eth-utils>=1.3.0,<2.0.0",
+        "eth-typing>=2.2.1,<3.0.0",
     ],
     'test': [
         "asn1tools>=0.146.2,<0.147",
