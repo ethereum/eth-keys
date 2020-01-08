@@ -15,6 +15,9 @@ from typing import (    # noqa: F401
     TYPE_CHECKING,
 )
 
+from eth_typing import (
+    ChecksumAddress,
+)
 from eth_utils import (
     big_endian_to_int,
     encode_hex,
@@ -24,9 +27,6 @@ from eth_utils import (
     keccak,
     to_checksum_address,
     to_normalized_address,
-)
-from eth_utils.typing import (
-    ChecksumAddress,
 )
 
 from eth_keys.utils.address import (

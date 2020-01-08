@@ -12,12 +12,13 @@ deps = {
     ],
     'eth-keys': [
         "eth-utils>=1.3.0,<2.0.0",
+        "eth-typing>=2.2.1,<3.0.0",
     ],
     'test': [
         "asn1tools>=0.146.2,<0.147",
         "pyasn1>=0.4.5,<0.5",
         'pytest==3.2.2',
-        'hypothesis==3.30.0',
+        'hypothesis>=4.56.1, <5.0.0',
         "eth-hash[pysha3];implementation_name=='cpython'",
         "eth-hash[pycryptodome];implementation_name=='pypy'",
     ],
