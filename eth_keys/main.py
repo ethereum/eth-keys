@@ -1,5 +1,10 @@
 from typing import (Any, Union, Type)  # noqa: F401
 
+from eth_utils import (
+    is_string,
+    ValidationError,
+)
+
 from eth_keys.datatypes import (
     BaseSignature,
     LazyBackend,
@@ -7,9 +12,6 @@ from eth_keys.datatypes import (
     PublicKey,
     PrivateKey,
     Signature,
-)
-from eth_keys.exceptions import (
-    ValidationError,
 )
 from eth_keys.validation import (
     validate_message_hash,
