@@ -27,6 +27,8 @@ from eth_utils import (
     keccak,
     to_checksum_address,
     to_normalized_address,
+    ValidationError,
+
 )
 
 from eth_keys.utils.address import (
@@ -41,7 +43,6 @@ from eth_keys.utils.padding import (
 
 from eth_keys.exceptions import (
     BadSignature,
-    ValidationError,
 )
 from eth_keys.validation import (
     validate_private_key_bytes,

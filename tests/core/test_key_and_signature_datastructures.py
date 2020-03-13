@@ -10,13 +10,11 @@ from eth_utils import (
     is_normalized_address,
     is_checksum_address,
     is_canonical_address,
+    ValidationError,
 )
 
 from eth_keys import KeyAPI
 from eth_keys.backends import NativeECCBackend
-from eth_keys.exceptions import (
-    ValidationError,
-)
 
 
 MSG = b'message'

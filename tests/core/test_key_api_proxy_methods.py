@@ -2,11 +2,11 @@ import pytest
 
 from eth_utils import (
     keccak,
+    ValidationError,
 )
 
 from eth_keys import KeyAPI
 from eth_keys.backends import NativeECCBackend
-from eth_keys.exceptions import ValidationError
 
 
 MSG = b'message'
