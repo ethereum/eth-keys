@@ -1,7 +1,6 @@
 from typing import (Any, Union, Type)  # noqa: F401
 
 from eth_utils import (
-    is_string,
     ValidationError,
 )
 
@@ -15,8 +14,6 @@ from eth_keys.datatypes import (
 )
 from eth_keys.validation import (
     validate_message_hash,
-    validate_compressed_public_key_bytes,
-    validate_uncompressed_public_key_bytes,
 )
 
 
