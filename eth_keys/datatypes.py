@@ -9,7 +9,6 @@ import collections
 import sys
 from typing import (    # noqa: F401
     Any,
-    cast,
     Tuple,
     Union,
     Type,
@@ -235,9 +234,7 @@ class PublicKey(BaseKey, LazyBackend):
     # Ethereum address conversions
     #
     def to_checksum_address(self) -> ChecksumAddress:
-        canonical_address = public_key_bytes_to_address(self.to_bytes())
-        # TODO: drop cast after to_checksum_address() returns eth_typing.evm.ChecksumAddress
-        return cast(ChecksumAddress, to_checksum_address(canonical_address))
+        return to_checksum_address(public_key_bytes_to_address(self.to_bytes()))
 
     def to_address(self) -> str:
         return to_normalized_address(public_key_bytes_to_address(self.to_bytes()))
