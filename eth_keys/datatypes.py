@@ -9,6 +9,7 @@ import collections
 import sys
 from typing import (    # noqa: F401
     Any,
+    cast,
     Tuple,
     Union,
     Type,
@@ -234,7 +235,9 @@ class PublicKey(BaseKey, LazyBackend):
     # Ethereum address conversions
     #
     def to_checksum_address(self) -> ChecksumAddress:
-        return to_checksum_address(public_key_bytes_to_address(self.to_bytes()))
+        canonical_address = public_key_bytes_to_address(self.to_bytes())
+        # TODO: drop cast after to_checksum_address() returns eth_typing.evm.ChecksumAddress
+        return cast(ChecksumAddress, to_checksum_address(canonical_address))
 
     def to_address(self) -> str:
         return to_normalized_address(public_key_bytes_to_address(self.to_bytes()))
@@ -395,12 +398,12 @@ class Signature(BaseSignature):
         validate_signature_v(value)
         self._v = value
 
-    @BaseSignature.r.setter
+    @BaseSignature.r.setter  # type: ignore
     def r(self, value: int) -> None:
         validate_signature_r_or_s(value)
         self._r = value
 
-    @BaseSignature.s.setter
+    @BaseSignature.s.setter  # type: ignore
     def s(self, value: int) -> None:
         validate_signature_r_or_s(value)
         self._s = value
@@ -446,7 +449,7 @@ class NonRecoverableSignature(BaseSignature):
 
         super().__init__(rs=(r, s), backend=backend)
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         return b''.join(
             pad32(int_to_big_endian(value))
             for value in self.rs
