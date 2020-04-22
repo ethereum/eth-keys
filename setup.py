@@ -43,7 +43,7 @@ deps['dev'] = (
 setup(
     name='eth-keys',
     # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
-    version='0.3.1',
+    version='0.3.2',
     description="""Common API for Ethereum key operations.""",
     long_description_markdown_filename='README.md',
     author='Piper Merriam',
