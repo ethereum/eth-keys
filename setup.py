@@ -17,8 +17,8 @@ deps = {
     'test': [
         "asn1tools>=0.146.2,<0.147",
         "pyasn1>=0.4.5,<0.5",
-        'pytest==3.2.2',
-        'hypothesis>=4.56.1, <5.0.0',
+        "pytest==5.4.1",
+        "hypothesis>=5.10.3, <6.0.0",
         "eth-hash[pysha3];implementation_name=='cpython'",
         "eth-hash[pycryptodome];implementation_name=='pypy'",
     ],
