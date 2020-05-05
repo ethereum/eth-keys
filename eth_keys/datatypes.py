@@ -395,12 +395,12 @@ class Signature(BaseSignature):
         validate_signature_v(value)
         self._v = value
 
-    @BaseSignature.r.setter
+    @BaseSignature.r.setter  # type: ignore
     def r(self, value: int) -> None:
         validate_signature_r_or_s(value)
         self._r = value
 
-    @BaseSignature.s.setter
+    @BaseSignature.s.setter  # type: ignore
     def s(self, value: int) -> None:
         validate_signature_r_or_s(value)
         self._s = value
@@ -446,7 +446,7 @@ class NonRecoverableSignature(BaseSignature):
 
         super().__init__(rs=(r, s), backend=backend)
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
         return b''.join(
             pad32(int_to_big_endian(value))
             for value in self.rs
