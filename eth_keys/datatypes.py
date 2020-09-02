@@ -117,9 +117,7 @@ class BaseKey(ByteString, collections.abc.Hashable):
     _raw_key = None  # type: bytes
 
     def to_hex(self) -> str:
-        # Need the 'type: ignore' comment below because of
-        # https://github.com/python/typeshed/issues/300
-        return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')  # type: ignore
+        return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
 
     def to_bytes(self) -> bytes:
         return self._raw_key
