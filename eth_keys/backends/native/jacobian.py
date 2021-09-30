@@ -1,6 +1,7 @@
 from typing import Tuple  # noqa: F401
 
 from eth_keys.constants import (
+    IDENTITY_POINTS,
     SECPK1_P as P,
     SECPK1_N as N,
     SECPK1_A as A,
@@ -90,3 +91,7 @@ def fast_multiply(a: Tuple[int, int],
 def fast_add(a: Tuple[int, int],
              b: Tuple[int, int]) -> Tuple[int, int]:
     return from_jacobian(jacobian_add(to_jacobian(a), to_jacobian(b)))
+
+
+def is_identity(p: Tuple[int, int, int]) -> bool:
+    return p in IDENTITY_POINTS

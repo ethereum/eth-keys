@@ -12,6 +12,7 @@ from eth_keys.backends import NativeECCBackend
 from eth_keys.constants import (
     SECPK1_N,
 )
+from eth_keys.exceptions import BadSignature
 from eth_keys.utils.numeric import (
     coerce_low_s,
 )
@@ -80,6 +81,32 @@ def test_ecdsa_recover(key_api, key_fixture):
     public_key = key_api.PublicKey(key_fixture['pubkey'])
 
     assert key_api.ecdsa_recover(MSGHASH, signature) == public_key
+
+
+@pytest.mark.parametrize(
+    'v,r,s,msghash',
+    (
+        (
+            # Test params from the ethereum/tests repo
+            0,
+            int("0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", 16),
+            int("0x6b8d2c81b11b2d699528dde488dbdf2f94293d0d33c32e347f255fa4a6c1f0a9", 16),
+            bytes.fromhex("6b8d2c81b11b2d699528dde488dbdf2f94293d0d33c32e347f255fa4a6c1f0a9")
+        ),
+        (
+            # Test params from signing a message using the private key: '0x' + '00' * 32
+            1,
+            29836180350949573232951565573845061551093497675544587026406064656720118638890,
+            36811185137926304485684021052401800813557229270017380070056792973957337676018,
+            bytes.fromhex('1476abb745d423bf09273f1afd887d951181d25adc66c4834a70491911b7f750'),
+        ),
+    ),
+)
+def test_ecdsa_recover_identity_point(key_api, key_fixture, v, r, s, msghash):
+    signature = key_api.Signature(vrs=(v, r, s))
+
+    with pytest.raises(BadSignature):
+       key_api.ecdsa_recover(msghash, signature)
 
 
 def test_decompress_public_key_bytes(key_api, key_fixture):

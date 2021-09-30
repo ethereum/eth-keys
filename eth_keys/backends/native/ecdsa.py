@@ -29,6 +29,7 @@ from .jacobian import (
     inv,
     fast_multiply,
     fast_add,
+    is_identity,
     jacobian_add,
     jacobian_multiply,
     from_jacobian,
@@ -159,6 +160,10 @@ def ecdsa_raw_recover(msg_hash: bytes,
     XY = jacobian_multiply((x, y, 1), s)
     Qr = jacobian_add(Gz, XY)
     Q = jacobian_multiply(Qr, inv(r, N))
+
+    if is_identity(Q):
+        raise BadSignature("InvalidSignature")
+
     raw_public_key = from_jacobian(Q)
 
     return encode_raw_public_key(raw_public_key)
