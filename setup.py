@@ -11,8 +11,8 @@ deps = {
         'coincurve>=7.0.0,<16.0.0',
     ],
     'eth-keys': [
-        "eth-utils>=1.8.2,<2.0.0",
-        "eth-typing>=2.2.1,<3.0.0",
+        "eth-utils>=2.0.0,<3.0.0",
+        "eth-typing>=3.0.0,<4",
     ],
     'test': [
         "asn1tools>=0.146.2,<0.147",
