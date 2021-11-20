@@ -246,6 +246,96 @@ jobs:
       - image: circleci/python:3.10
         environment:
           TOXENV: py310-backends-coincurve12
+  py36-backends-coincurve13:
+    <<: *common
+    docker:
+      - image: circleci/python:3.6
+        environment:
+          TOXENV: py36-backends-coincurve13
+  py37-backends-coincurve13:
+    <<: *common
+    docker:
+      - image: circleci/python:3.7
+        environment:
+          TOXENV: py37-backends-coincurve13
+  py38-backends-coincurve13:
+    <<: *common
+    docker:
+      - image: circleci/python:3.8
+        environment:
+          TOXENV: py38-backends-coincurve13
+  py39-backends-coincurve13:
+    <<: *common
+    docker:
+      - image: circleci/python:3.9
+        environment:
+          TOXENV: py39-backends-coincurve13
+  py310-backends-coincurve13:
+    <<: *common
+    docker:
+      - image: circleci/python:3.10
+        environment:
+          TOXENV: py310-backends-coincurve13
+  py36-backends-coincurve14:
+    <<: *common
+    docker:
+      - image: circleci/python:3.6
+        environment:
+          TOXENV: py36-backends-coincurve14
+  py37-backends-coincurve14:
+    <<: *common
+    docker:
+      - image: circleci/python:3.7
+        environment:
+          TOXENV: py37-backends-coincurve14
+  py38-backends-coincurve14:
+    <<: *common
+    docker:
+      - image: circleci/python:3.8
+        environment:
+          TOXENV: py38-backends-coincurve14
+  py39-backends-coincurve14:
+    <<: *common
+    docker:
+      - image: circleci/python:3.9
+        environment:
+          TOXENV: py39-backends-coincurve14
+  py310-backends-coincurve14:
+    <<: *common
+    docker:
+      - image: circleci/python:3.10
+        environment:
+          TOXENV: py310-backends-coincurve14
+  py36-backends-coincurve15:
+    <<: *common
+    docker:
+      - image: circleci/python:3.6
+        environment:
+          TOXENV: py36-backends-coincurve15
+  py37-backends-coincurve15:
+    <<: *common
+    docker:
+      - image: circleci/python:3.7
+        environment:
+          TOXENV: py37-backends-coincurve15
+  py38-backends-coincurve15:
+    <<: *common
+    docker:
+      - image: circleci/python:3.8
+        environment:
+          TOXENV: py38-backends-coincurve15
+  py39-backends-coincurve15:
+    <<: *common
+    docker:
+      - image: circleci/python:3.9
+        environment:
+          TOXENV: py39-backends-coincurve15
+  py310-backends-coincurve15:
+    <<: *common
+    docker:
+      - image: circleci/python:3.10
+        environment:
+          TOXENV: py310-backends-coincurve15
 workflows:
   version: 2
   test:
@@ -287,3 +377,18 @@ workflows:
       - py38-backends-coincurve12
       - py39-backends-coincurve12
       - py310-backends-coincurve12
+      - py36-backends-coincurve13
+      - py37-backends-coincurve13
+      - py38-backends-coincurve13
+      - py39-backends-coincurve13
+      - py310-backends-coincurve13
+      - py36-backends-coincurve14
+      - py37-backends-coincurve14
+      - py38-backends-coincurve14
+      - py39-backends-coincurve14
+      - py310-backends-coincurve14
+      - py36-backends-coincurve15
+      - py37-backends-coincurve15
+      - py38-backends-coincurve15
+      - py39-backends-coincurve15
+      - py310-backends-coincurve15

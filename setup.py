@@ -8,7 +8,7 @@ from setuptools import (
 
 deps = {
     'coincurve': [
-        'coincurve>=7.0.0,<13.0.0',
+        'coincurve>=7.0.0,<16.0.0',
     ],
     'eth-keys': [
         "eth-utils>=1.8.2,<2.0.0",
