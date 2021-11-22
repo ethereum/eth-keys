@@ -31,12 +31,12 @@ MSGHASH = keccak(MSG)
 MAX_EXAMPLES = 200
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def native_key_api():
     return KeyAPI(backend=NativeECCBackend())
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def coincurve_key_api():
     return KeyAPI(backend=CoinCurveECCBackend())
 

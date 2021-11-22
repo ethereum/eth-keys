@@ -8,7 +8,7 @@ from setuptools import (
 
 deps = {
     'coincurve': [
-        'coincurve>=7.0.0,<13.0.0',
+        'coincurve>=7.0.0,<16.0.0',
     ],
     'eth-keys': [
         "eth-utils>=1.8.2,<2.0.0",
@@ -18,7 +18,7 @@ deps = {
         "asn1tools>=0.146.2,<0.147",
         "factory-boy>=3.0.1,<3.1",
         "pyasn1>=0.4.5,<0.5",
-        "pytest==5.4.1",
+        "pytest==6.2.5",
         "hypothesis>=5.10.3, <6.0.0",
         "eth-hash[pysha3];implementation_name=='cpython'",
         "eth-hash[pycryptodome];implementation_name=='pypy'",
@@ -69,9 +69,10 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
 )

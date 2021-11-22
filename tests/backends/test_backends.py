@@ -46,7 +46,7 @@ def backend_id_fn(backend):
     return type(backend).__name__
 
 
-@pytest.fixture(params=backends, ids=backend_id_fn)
+@pytest.fixture(params=backends, ids=backend_id_fn, scope='module')
 def key_api(request):
     return KeyAPI(backend=request.param)
 
