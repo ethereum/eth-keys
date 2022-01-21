@@ -1,3 +1,19 @@
+v0.3.4
+------
+
+Released Jan 21, 2022
+
+- Raise BadSignature error if ecrecover returns a point at infinity
+  https://github.com/ethereum/eth-keys/pull/76
+- Add factories for Public and Private Keys
+  https://github.com/ethereum/eth-keys/pull/74
+- Add Python 3.8 support
+  https://github.com/ethereum/eth-keys/pull/66
+- Pytest upgrade
+  https://github.com/ethereum/eth-keys/pull/73
+- Enable lint tests
+  https://github.com/ethereum/eth-keys/pull/72
+
 v0.3.3
 ------
 
