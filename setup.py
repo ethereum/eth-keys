@@ -60,7 +60,7 @@ setup(
     extras_require=deps,
     license="MIT",
     zip_safe=False,
-    package_data={'eth-keys': ['py.typed']},
+    package_data={'eth_keys': ['py.typed']},
     keywords='ethereum',
     packages=find_packages(exclude=["tests", "tests.*"]),
     classifiers=[
