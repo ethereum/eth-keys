@@ -1,51 +1,51 @@
-# Ethereum Keys
+# eth-keys
 
+[![Join the conversation on Discord](https://img.shields.io/discord/809793915578089484?color=blue&label=chat&logo=discord&logoColor=white)](https://discord.gg/GHryRvPB84)
+[![Build Status](https://circleci.com/gh/ethereum/eth-keys.svg?style=shield)](https://circleci.com/gh/ethereum/eth-keys)
+[![PyPI version](https://badge.fury.io/py/eth-keys.svg)](https://badge.fury.io/py/eth-keys)
+[![Python versions](https://img.shields.io/pypi/pyversions/eth-keys.svg)](https://pypi.python.org/pypi/eth-keys)
 
-A common API for Ethereum key operations with pluggable backends.
-
+Common API for Ethereum key operations
 
 > This library and repository was previously located at https://github.com/pipermerriam/ethereum-keys.  It was transferred to the Ethereum foundation github in November 2017 and renamed to `eth-keys`.  The PyPi package was also renamed from `ethereum-keys` to `eth-keys`.
 
-## Installation
+Read more in the documentation below. [View the change log](https://github.com/ethereum/eth-keys/blob/main/CHANGELOG.rst).
+
+## Quickstart
 
 ```sh
-pip install eth-keys
+python -m pip install eth-keys
 ```
 
-## Development
+## Developer Setup
+
+If you would like to hack on eth-keys, please check out the [Snake Charmers
+Tactical Manual](https://github.com/ethereum/snake-charmers-tactical-manual)
+for information on how we do:
+
+- Testing
+- Pull Requests
+- Documentation
+
+We use [pre-commit](https://pre-commit.com/) to maintain consistent code style. Once
+installed, it will run automatically with every commit. You can also run it manually
+with `make lint`. If you need to make a commit that skips the `pre-commit` checks, you
+can do so with `git commit --no-verify`.
+
+### Development Environment Setup
+
+You can set up your dev environment with:
 
 ```sh
-pip install -e .[dev]
+git clone git@github.com:ethereum/eth-keys.git
+cd eth-keys
+virtualenv -p python3 venv
+. venv/bin/activate
+python -m pip install -e ".[dev]"
+pre-commit install
 ```
 
-
-### Running the tests
-
-You can run the tests with:
-
-```sh
-py.test tests
-```
-
-Or you can install `tox` to run the full test suite.
-
-
-### Releasing
-
-Pandoc is required for transforming the markdown README to the proper format to
-render correctly on pypi.
-
-For Debian-like systems:
-
-```
-apt install pandoc
-```
-
-Or on OSX:
-
-```sh
-brew install pandoc
-```
+### Release setup
 
 To release a new version:
 
@@ -53,19 +53,20 @@ To release a new version:
 make release bump=$$VERSION_PART_TO_BUMP$$
 ```
 
-
 #### How to bumpversion
 
 The version format for this repo is `{major}.{minor}.{patch}` for stable, and
 `{major}.{minor}.{patch}-{stage}.{devnum}` for unstable (`stage` can be alpha or beta).
 
 To issue the next version in line, specify which part to bump,
-like `make release bump=minor` or `make release bump=devnum`.
+like `make release bump=minor` or `make release bump=devnum`. This is typically done from the
+main branch, except when releasing a beta (in which case the beta is released from main,
+and the previous stable branch is released from said branch).
 
 If you are in a beta version, `make release bump=stage` will switch to a stable.
 
 To issue an unstable version when the current version is stable, specify the
-new version explicitly, like `make release bump="--new-version 2.0.0-alpha.1 devnum"`
+new version explicitly, like `make release bump="--new-version 4.0.0-alpha.1 devnum"`
 
 
 
