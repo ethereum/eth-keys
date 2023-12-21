@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from setuptools import (
     find_packages,
     setup,
@@ -7,7 +6,7 @@ from setuptools import (
 
 extras_require = {
     "coincurve": [
-        "coincurve>=7.0.0,<16.0.0",
+        "coincurve>=12.0.0",
     ],
     "dev": [
         "build>=0.9.0",
@@ -23,18 +22,19 @@ extras_require = {
     ],
     "test": [
         "pytest>=7.0.0",
-        "pytest-xdist>=2.4.0",
-        "asn1tools>=0.146.2,<0.147",
-        "factory-boy>=3.0.1,<3.1",
-        "pyasn1>=0.4.5,<0.5",
-        "hypothesis>=5.10.3, <6.0.0",
-        "eth-hash[pysha3];implementation_name=='cpython'",
-        "eth-hash[pycryptodome];implementation_name=='pypy'",
+        "asn1tools>=0.146.2",
+        "factory-boy>=3.0.1",
+        "pyasn1>=0.4.5",
+        "hypothesis>=5.10.3,<6",
+        "eth-hash[pysha3]",
     ],
 }
 
 extras_require["dev"] = (
-    extras_require["coincurve"] + extras_require["dev"] + extras_require["docs"] + extras_require["test"]
+    extras_require["coincurve"]
+    + extras_require["dev"]
+    + extras_require["docs"]
+    + extras_require["test"]
 )
 
 
@@ -45,7 +45,7 @@ with open("./README.md") as readme:
 setup(
     name="eth-keys",
     # *IMPORTANT*: Don't manually change the version here. Use `make bump`, as described in readme
-    version="0.1.0-alpha.0",
+    version="0.4.0",
     description="""eth-keys: Common API for Ethereum key operations""",
     long_description=long_description,
     long_description_content_type="text/markdown",

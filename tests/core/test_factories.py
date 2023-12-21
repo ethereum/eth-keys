@@ -1,4 +1,6 @@
-from eth_keys import keys
+from eth_keys import (
+    keys,
+)
 from eth_keys.tools.factories import (
     PrivateKeyFactory,
     PublicKeyFactory,

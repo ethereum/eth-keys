@@ -1,24 +1,26 @@
-from __future__ import unicode_literals
-
-import pytest
-
 from eth_utils import (
+    ValidationError,
     decode_hex,
     encode_hex,
-    keccak,
-    is_same_address,
-    is_normalized_address,
-    is_checksum_address,
     is_canonical_address,
-    ValidationError,
+    is_checksum_address,
+    is_normalized_address,
+    is_same_address,
+    keccak,
+)
+import pytest
+
+from eth_keys import (
+    KeyAPI,
+)
+from eth_keys.backends import (
+    NativeECCBackend,
+)
+from eth_keys.exceptions import (
+    ValidationError as EthKeysValidationErrorCopy,
 )
 
-from eth_keys import KeyAPI
-from eth_keys.backends import NativeECCBackend
-from eth_keys.exceptions import ValidationError as EthKeysValidationErrorCopy
-
-
-MSG = b'message'
+MSG = b"message"
 MSGHASH = keccak(MSG)
 
 
@@ -28,9 +30,9 @@ def key_api():
 
 
 PK_BYTES = decode_hex(
-    '0x58d23b55bc9cdce1f18c2500f40ff4ab7245df9a89505e9b1fa4851f623d241d'
+    "0x58d23b55bc9cdce1f18c2500f40ff4ab7245df9a89505e9b1fa4851f623d241d"
 )
-ADDRESS = '0xdc544d1aa88ff8bbd2f2aec754b1f1e99e1812fd'
+ADDRESS = "0xdc544d1aa88ff8bbd2f2aec754b1f1e99e1812fd"
 
 
 @pytest.fixture
@@ -129,7 +131,7 @@ def test_to_canonical_address_from_public_key(private_key):
 
 def test_hex_conversion(private_key):
     public_key = private_key.public_key
-    signature = private_key.sign_msg(b'message')
+    signature = private_key.sign_msg(b"message")
 
     assert hex(public_key) == encode_hex(public_key.to_bytes())
     assert hex(private_key) == encode_hex(private_key.to_bytes())
@@ -142,7 +144,7 @@ def test_hex_conversion(private_key):
 
 def test_bytes_conversion(key_api, private_key):
     public_key = private_key.public_key
-    signature = private_key.sign_msg(b'message')
+    signature = private_key.sign_msg(b"message")
 
     assert public_key.to_bytes() == public_key._raw_key
     assert private_key.to_bytes() == private_key._raw_key
@@ -156,7 +158,9 @@ def test_compressed_bytes_conversion(key_api, private_key):
     assert key_api.PublicKey.from_compressed_bytes(compressed_bytes) == public_key
 
 
-@pytest.mark.parametrize('validation_error', (ValidationError, EthKeysValidationErrorCopy))
+@pytest.mark.parametrize(
+    "validation_error", (ValidationError, EthKeysValidationErrorCopy)
+)
 def test_compressed_bytes_validation(key_api, private_key, validation_error):
     valid_key = private_key.public_key.to_compressed_bytes()
 

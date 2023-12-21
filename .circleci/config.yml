@@ -159,72 +159,18 @@ jobs:
       - image: cimg/python:3.8
         environment:
           TOXENV: py38-backends-coincurve12
-  py39-backends-coincurve12:
-    <<: *common
-    docker:
-      - image: cimg/python:3.9
-        environment:
-          TOXENV: py39-backends-coincurve12
-  py310-backends-coincurve12:
-    <<: *common
-    docker:
-      - image: cimg/python:3.10
-        environment:
-          TOXENV: py310-backends-coincurve12
-  py311-backends-coincurve12:
-    <<: *common
-    docker:
-      - image: cimg/python:3.11
-        environment:
-          TOXENV: py311-backends-coincurve12
   py38-backends-coincurve13:
     <<: *common
     docker:
       - image: cimg/python:3.8
         environment:
           TOXENV: py38-backends-coincurve13
-  py39-backends-coincurve13:
-    <<: *common
-    docker:
-      - image: cimg/python:3.9
-        environment:
-          TOXENV: py39-backends-coincurve13
-  py310-backends-coincurve13:
-    <<: *common
-    docker:
-      - image: cimg/python:3.10
-        environment:
-          TOXENV: py310-backends-coincurve13
-  py311-backends-coincurve13:
-    <<: *common
-    docker:
-      - image: cimg/python:3.11
-        environment:
-          TOXENV: py311-backends-coincurve13
   py38-backends-coincurve14:
     <<: *common
     docker:
       - image: cimg/python:3.8
         environment:
           TOXENV: py38-backends-coincurve14
-  py39-backends-coincurve14:
-    <<: *common
-    docker:
-      - image: cimg/python:3.9
-        environment:
-          TOXENV: py39-backends-coincurve14
-  py310-backends-coincurve14:
-    <<: *common
-    docker:
-      - image: cimg/python:3.10
-        environment:
-          TOXENV: py310-backends-coincurve14
-  py311-backends-coincurve14:
-    <<: *common
-    docker:
-      - image: cimg/python:3.11
-        environment:
-          TOXENV: py311-backends-coincurve14
   py38-backends-coincurve15:
     <<: *common
     docker:
@@ -237,18 +183,69 @@ jobs:
       - image: cimg/python:3.9
         environment:
           TOXENV: py39-backends-coincurve15
-  py310-backends-coincurve15:
+
+  py38-backends-coincurve16:
+    <<: *common
+    docker:
+      - image: cimg/python:3.8
+        environment:
+          TOXENV: py38-backends-coincurve16
+  py39-backends-coincurve16:
+    <<: *common
+    docker:
+      - image: cimg/python:3.9
+        environment:
+          TOXENV: py39-backends-coincurve16
+  py310-backends-coincurve16:
     <<: *common
     docker:
       - image: cimg/python:3.10
         environment:
-          TOXENV: py310-backends-coincurve15
-  py311-backends-coincurve15:
+          TOXENV: py310-backends-coincurve16
+
+  py38-backends-coincurve17:
+    <<: *common
+    docker:
+      - image: cimg/python:3.8
+        environment:
+          TOXENV: py38-backends-coincurve17
+  py39-backends-coincurve17:
+    <<: *common
+    docker:
+      - image: cimg/python:3.9
+        environment:
+          TOXENV: py39-backends-coincurve17
+  py310-backends-coincurve17:
+    <<: *common
+    docker:
+      - image: cimg/python:3.10
+        environment:
+          TOXENV: py310-backends-coincurve17
+
+  py38-backends-coincurve18:
+    <<: *common
+    docker:
+      - image: cimg/python:3.8
+        environment:
+          TOXENV: py38-backends-coincurve18
+  py39-backends-coincurve18:
+    <<: *common
+    docker:
+      - image: cimg/python:3.9
+        environment:
+          TOXENV: py39-backends-coincurve18
+  py310-backends-coincurve18:
+    <<: *common
+    docker:
+      - image: cimg/python:3.10
+        environment:
+          TOXENV: py310-backends-coincurve18
+  py311-backends-coincurve18:
     <<: *common
     docker:
       - image: cimg/python:3.11
         environment:
-          TOXENV: py311-backends-coincurve15
+          TOXENV: py311-backends-coincurve18
 
 workflows:
   version: 2
@@ -269,18 +266,17 @@ workflows:
       - py311-wheel
       - py311-wheel-windows
       - py38-backends-coincurve12
-      - py39-backends-coincurve12
-      - py310-backends-coincurve12
-      - py311-backends-coincurve12
       - py38-backends-coincurve13
-      - py39-backends-coincurve13
-      - py310-backends-coincurve13
-      - py311-backends-coincurve13
       - py38-backends-coincurve14
-      - py39-backends-coincurve14
-      - py310-backends-coincurve14
-      - py311-backends-coincurve14
       - py38-backends-coincurve15
       - py39-backends-coincurve15
-      - py310-backends-coincurve15
-      - py311-backends-coincurve15
+      - py38-backends-coincurve16
+      - py39-backends-coincurve16
+      - py310-backends-coincurve16
+      - py38-backends-coincurve17
+      - py39-backends-coincurve17
+      - py310-backends-coincurve17
+      - py38-backends-coincurve18
+      - py39-backends-coincurve18
+      - py310-backends-coincurve18
+      - py311-backends-coincurve18

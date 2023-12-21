@@ -33,7 +33,7 @@ lint:
 test:
 	pytest tests
 
-docs: check-docs
+docs:
 	python ./newsfragments/validate_files.py
 	towncrier build --draft --version preview
 
