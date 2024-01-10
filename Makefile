@@ -48,7 +48,7 @@ notes: check-bump
 	# Now generate the release notes to have them included in the release commit
 	towncrier build --yes --version $(UPCOMING_VERSION)
 	# Before we bump the version, make sure that the towncrier-generated docs will build
-	make build-docs
+	make docs
 	git commit -m "Compile release notes for v$(UPCOMING_VERSION)"
 
 release: check-bump clean
@@ -56,7 +56,7 @@ release: check-bump clean
 	@git remote -v | grep -E "upstream\tgit@github.com:ethereum/eth-keys.git \(push\)|upstream\thttps://(www.)?github.com/ethereum/eth-keys \(push\)"
 	# verify that docs build correctly
 	./newsfragments/validate_files.py is-empty
-	make build-docs
+	make docs
 	CURRENT_SIGN_SETTING=$(git config commit.gpgSign)
 	git config commit.gpgSign true
 	bumpversion $(bump)
