@@ -1,5 +1,3 @@
-from typing import (Any, Union, Type)  # noqa: F401
-
 from eth_utils import (
     ValidationError,
 )
@@ -8,14 +6,13 @@ from eth_keys.datatypes import (
     BaseSignature,
     LazyBackend,
     NonRecoverableSignature,
-    PublicKey,
     PrivateKey,
+    PublicKey,
     Signature,
 )
 from eth_keys.validation import (
     validate_message_hash,
 )
-
 
 # These must be aliased due to a scoping issue in mypy
 # https://github.com/python/mypy/issues/1775
@@ -26,24 +23,20 @@ _NonRecoverableSignature = NonRecoverableSignature
 
 
 class KeyAPI(LazyBackend):
-    #
-    # datatype shortcuts
-    #
-    PublicKey = PublicKey  # type: Type[_PublicKey]
-    PrivateKey = PrivateKey  # type: Type[_PrivateKey]
-    Signature = Signature  # type: Type[_Signature]
-    NonRecoverableSignature = NonRecoverableSignature  # type: Type[_NonRecoverableSignature]
+    PublicKey = PublicKey
+    PrivateKey = PrivateKey
+    Signature = Signature
+    NonRecoverableSignature = NonRecoverableSignature
 
     #
     # Proxy method calls to the backends
     #
-    def ecdsa_sign(self,
-                   message_hash: bytes,
-                   private_key: _PrivateKey) -> _Signature:
+    def ecdsa_sign(self, message_hash: bytes, private_key: _PrivateKey) -> _Signature:
         validate_message_hash(message_hash)
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
-                "The `private_key` must be an instance of `eth_keys.datatypes.PrivateKey`"
+                "The `private_key` must be an instance of "
+                "`eth_keys.datatypes.PrivateKey`"
             )
         signature = self.backend.ecdsa_sign(message_hash, private_key)
         if not isinstance(signature, Signature):
@@ -53,13 +46,14 @@ class KeyAPI(LazyBackend):
             )
         return signature
 
-    def ecdsa_sign_non_recoverable(self,
-                                   message_hash: bytes,
-                                   private_key: _PrivateKey) -> _NonRecoverableSignature:
+    def ecdsa_sign_non_recoverable(
+        self, message_hash: bytes, private_key: _PrivateKey
+    ) -> _NonRecoverableSignature:
         validate_message_hash(message_hash)
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
-                "The `private_key` must be an instance of `eth_keys.datatypes.PrivateKey`"
+                "The `private_key` must be an instance of "
+                "`eth_keys.datatypes.PrivateKey`"
             )
         signature = self.backend.ecdsa_sign_non_recoverable(message_hash, private_key)
         if not isinstance(signature, NonRecoverableSignature):
@@ -69,10 +63,9 @@ class KeyAPI(LazyBackend):
             )
         return signature
 
-    def ecdsa_verify(self,
-                     message_hash: bytes,
-                     signature: BaseSignature,
-                     public_key: _PublicKey) -> bool:
+    def ecdsa_verify(
+        self, message_hash: bytes, signature: BaseSignature, public_key: _PublicKey
+    ) -> bool:
         validate_message_hash(message_hash)
         if not isinstance(public_key, PublicKey):
             raise ValidationError(
@@ -80,13 +73,12 @@ class KeyAPI(LazyBackend):
             )
         if not isinstance(signature, BaseSignature):
             raise ValidationError(
-                "The `signature` must be an instance of `eth_keys.datatypes.BaseSignature`"
+                "The `signature` must be an instance of "
+                "`eth_keys.datatypes.BaseSignature`"
             )
         return self.backend.ecdsa_verify(message_hash, signature, public_key)
 
-    def ecdsa_recover(self,
-                      message_hash: bytes,
-                      signature: _Signature) -> _PublicKey:
+    def ecdsa_recover(self, message_hash: bytes, signature: _Signature) -> _PublicKey:
         validate_message_hash(message_hash)
         if not isinstance(signature, Signature):
             raise ValidationError(
@@ -103,7 +95,8 @@ class KeyAPI(LazyBackend):
     def private_key_to_public_key(self, private_key: _PrivateKey) -> _PublicKey:
         if not isinstance(private_key, PrivateKey):
             raise ValidationError(
-                "The `private_key` must be an instance of `eth_keys.datatypes.PrivateKey`"
+                "The `private_key` must be an instance of "
+                "`eth_keys.datatypes.PrivateKey`"
             )
         public_key = self.backend.private_key_to_public_key(private_key)
         if not isinstance(public_key, PublicKey):

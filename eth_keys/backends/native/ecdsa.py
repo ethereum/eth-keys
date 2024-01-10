@@ -3,36 +3,41 @@ Functions lifted from https://github.com/vbuterin/pybitcointools
 """
 import hashlib
 import hmac
-from typing import (Any, Callable, Optional, Tuple)  # noqa: F401
+from typing import (
+    Any,
+    Callable,
+    Tuple,
+)
 
 from eth_utils import (
-    int_to_big_endian,
     big_endian_to_int,
+    int_to_big_endian,
 )
 
 from eth_keys.constants import (
-    SECPK1_N as N,
-    SECPK1_G as G,
-    SECPK1_Gx as Gx,
-    SECPK1_Gy as Gy,
-    SECPK1_P as P,
     SECPK1_A as A,
     SECPK1_B as B,
+    SECPK1_G as G,
+    SECPK1_N as N,
+    SECPK1_P as P,
+    SECPK1_Gx as Gx,
+    SECPK1_Gy as Gy,
 )
 from eth_keys.exceptions import (
     BadSignature,
 )
-
-from eth_keys.utils.padding import pad32
+from eth_keys.utils.padding import (
+    pad32,
+)
 
 from .jacobian import (
-    inv,
-    fast_multiply,
     fast_add,
+    fast_multiply,
+    from_jacobian,
+    inv,
     is_identity,
     jacobian_add,
     jacobian_multiply,
-    from_jacobian,
 )
 
 
@@ -44,10 +49,12 @@ def decode_public_key(public_key_bytes: bytes) -> Tuple[int, int]:
 
 def encode_raw_public_key(raw_public_key: Tuple[int, int]) -> bytes:
     left, right = raw_public_key
-    return b''.join((
-        pad32(int_to_big_endian(left)),
-        pad32(int_to_big_endian(right)),
-    ))
+    return b"".join(
+        (
+            pad32(int_to_big_endian(left)),
+            pad32(int_to_big_endian(right)),
+        )
+    )
 
 
 def private_key_to_public_key(private_key_bytes: bytes) -> bytes:
@@ -90,15 +97,21 @@ def decompress_public_key(compressed_public_key_bytes: bytes) -> bytes:
     return encode_raw_public_key((x, y))
 
 
-def deterministic_generate_k(msg_hash: bytes,
-                             private_key_bytes: bytes,
-                             digest_fn: Callable[[], Any] = hashlib.sha256) -> int:
-    v_0 = b'\x01' * 32
-    k_0 = b'\x00' * 32
+def deterministic_generate_k(
+    msg_hash: bytes,
+    private_key_bytes: bytes,
+    digest_fn: Callable[[], Any] = hashlib.sha256,
+) -> int:
+    v_0 = b"\x01" * 32
+    k_0 = b"\x00" * 32
 
-    k_1 = hmac.new(k_0, v_0 + b'\x00' + private_key_bytes + msg_hash, digest_fn).digest()
+    k_1 = hmac.new(
+        k_0, v_0 + b"\x00" + private_key_bytes + msg_hash, digest_fn
+    ).digest()
     v_1 = hmac.new(k_1, v_0, digest_fn).digest()
-    k_2 = hmac.new(k_1, v_1 + b'\x01' + private_key_bytes + msg_hash, digest_fn).digest()
+    k_2 = hmac.new(
+        k_1, v_1 + b"\x01" + private_key_bytes + msg_hash, digest_fn
+    ).digest()
     v_2 = hmac.new(k_2, v_1, digest_fn).digest()
 
     kb = hmac.new(k_2, v_2, digest_fn).digest()
@@ -106,8 +119,7 @@ def deterministic_generate_k(msg_hash: bytes,
     return k
 
 
-def ecdsa_raw_sign(msg_hash: bytes,
-                   private_key_bytes: bytes) -> Tuple[int, int, int]:
+def ecdsa_raw_sign(msg_hash: bytes, private_key_bytes: bytes) -> Tuple[int, int, int]:
     z = big_endian_to_int(msg_hash)
     k = deterministic_generate_k(msg_hash, private_key_bytes)
 
@@ -120,9 +132,9 @@ def ecdsa_raw_sign(msg_hash: bytes,
     return v - 27, r, s
 
 
-def ecdsa_raw_verify(msg_hash: bytes,
-                     rs: Tuple[int, int],
-                     public_key_bytes: bytes) -> bool:
+def ecdsa_raw_verify(
+    msg_hash: bytes, rs: Tuple[int, int], public_key_bytes: bytes
+) -> bool:
     raw_public_key = decode_public_key(public_key_bytes)
 
     r, s = rs
@@ -138,13 +150,12 @@ def ecdsa_raw_verify(msg_hash: bytes,
     return bool(r == x and (r % N) and (s % N))
 
 
-def ecdsa_raw_recover(msg_hash: bytes,
-                      vrs: Tuple[int, int, int]) -> bytes:
+def ecdsa_raw_recover(msg_hash: bytes, vrs: Tuple[int, int, int]) -> bytes:
     v, r, s = vrs
     v += 27
 
     if not (27 <= v <= 34):
-        raise BadSignature("%d must in range 27-31" % v)
+        raise BadSignature(f"{v} must in range 27-31")
 
     x = r
 

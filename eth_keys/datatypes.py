@@ -1,24 +1,22 @@
-from __future__ import absolute_import
-
 from abc import (
     ABC,
     abstractmethod,
 )
 import codecs
 import collections
-import sys
-from typing import (    # noqa: F401
+from typing import (
+    TYPE_CHECKING,
     Any,
     Tuple,
-    Union,
     Type,
-    TYPE_CHECKING,
+    Union,
 )
 
 from eth_typing import (
     ChecksumAddress,
 )
 from eth_utils import (
+    ValidationError,
     big_endian_to_int,
     encode_hex,
     int_to_big_endian,
@@ -27,10 +25,11 @@ from eth_utils import (
     keccak,
     to_checksum_address,
     to_normalized_address,
-    ValidationError,
-
 )
 
+from eth_keys.exceptions import (
+    BadSignature,
+)
 from eth_keys.utils.address import (
     public_key_bytes_to_address,
 )
@@ -40,39 +39,27 @@ from eth_keys.utils.numeric import (
 from eth_keys.utils.padding import (
     pad32,
 )
-
-from eth_keys.exceptions import (
-    BadSignature,
-)
 from eth_keys.validation import (
-    validate_private_key_bytes,
     validate_compressed_public_key_bytes,
-    validate_uncompressed_public_key_bytes,
-    validate_recoverable_signature_bytes,
     validate_non_recoverable_signature_bytes,
-    validate_signature_v,
+    validate_private_key_bytes,
+    validate_recoverable_signature_bytes,
     validate_signature_r_or_s,
+    validate_signature_v,
+    validate_uncompressed_public_key_bytes,
 )
 
 if TYPE_CHECKING:
-    from eth_keys.backends.base import BaseECCBackend  # noqa: F401
-
-
-# Must compare against version_info[0] and not version_info.major to please mypy.
-if sys.version_info[0] == 2:
-    ByteString = type(
-        b'BaseString',
-        (collections.abc.Sequence, basestring),  # noqa: F821
-        {},
-    )  # type: Any
-else:
-    ByteString = collections.abc.ByteString
+    from eth_keys.backends.base import (
+        BaseECCBackend,
+    )
 
 
 class LazyBackend:
-    def __init__(self,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
-                 ) -> None:
+    def __init__(
+        self,
+        backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
+    ) -> None:
         from eth_keys.backends.base import (  # noqa: F811
             BaseECCBackend,
         )
@@ -94,30 +81,33 @@ class LazyBackend:
 
         self.backend = backend
 
-    _backend = None  # type: BaseECCBackend
+    _backend: "BaseECCBackend" = None
 
     @property
-    def backend(self) -> 'BaseECCBackend':
+    def backend(self) -> "BaseECCBackend":
         if self._backend is None:
             return self.get_backend()
         else:
             return self._backend
 
     @backend.setter
-    def backend(self, value: 'BaseECCBackend') -> None:
+    def backend(self, value: "BaseECCBackend") -> None:
         self._backend = value
 
     @classmethod
-    def get_backend(cls, *args: Any, **kwargs: Any) -> 'BaseECCBackend':
-        from eth_keys.backends import get_backend
+    def get_backend(cls, *args: Any, **kwargs: Any) -> "BaseECCBackend":
+        from eth_keys.backends import (
+            get_backend,
+        )
+
         return get_backend(*args, **kwargs)
 
 
-class BaseKey(ByteString, collections.abc.Hashable):
-    _raw_key = None  # type: bytes
+class BaseKey(collections.abc.Hashable):
+    _raw_key: bytes = None
 
     def to_hex(self) -> str:
-        return '0x' + codecs.decode(codecs.encode(self._raw_key, 'hex'), 'ascii')
+        return "0x" + codecs.decode(codecs.encode(self._raw_key, "hex"), "ascii")
 
     def to_bytes(self) -> bytes:
         return self._raw_key
@@ -135,13 +125,11 @@ class BaseKey(ByteString, collections.abc.Hashable):
         # TODO: this seems wrong.
         return 64
 
-    # Must be typed with `ignore` due to
-    # https://github.com/python/mypy/issues/1237
-    def __getitem__(self, index: int) -> int:  # type: ignore
+    def __getitem__(self, index: int) -> int:
         return self._raw_key[index]
 
     def __eq__(self, other: Any) -> bool:
-        if hasattr(other, 'to_bytes'):
+        if hasattr(other, "to_bytes"):
             return self.to_bytes() == other.to_bytes()
         elif is_bytes(other):
             return self.to_bytes() == other
@@ -149,80 +137,86 @@ class BaseKey(ByteString, collections.abc.Hashable):
             return False
 
     def __repr__(self) -> str:
-        return "'{0}'".format(self.to_hex())
+        return f"'{self.to_hex()}'"
 
     def __index__(self) -> int:
         return self.__int__()
 
     def __hex__(self) -> str:
-        if sys.version_info[0] == 2:
-            return codecs.encode(self.to_hex(), 'ascii')
-        else:
-            return self.to_hex()
+        return self.to_hex()
 
 
 class PublicKey(BaseKey, LazyBackend):
-    def __init__(self,
-                 public_key_bytes: bytes,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
-                 ) -> None:
+    def __init__(
+        self,
+        public_key_bytes: bytes,
+        backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
+    ) -> None:
         validate_uncompressed_public_key_bytes(public_key_bytes)
 
         self._raw_key = public_key_bytes
         super().__init__(backend=backend)
 
     @classmethod
-    def from_compressed_bytes(cls,
-                              compressed_public_key_bytes: bytes,
-                              backend: 'BaseECCBackend' = None,
-                              ) -> 'PublicKey':
+    def from_compressed_bytes(
+        cls,
+        compressed_public_key_bytes: bytes,
+        backend: "BaseECCBackend" = None,
+    ) -> "PublicKey":
         validate_compressed_public_key_bytes(compressed_public_key_bytes)
 
         if backend is None:
             backend = cls.get_backend()
-        uncompressed_key = backend.decompress_public_key_bytes(compressed_public_key_bytes)
+        uncompressed_key = backend.decompress_public_key_bytes(
+            compressed_public_key_bytes
+        )
 
         return cls(uncompressed_key, backend)
 
     @classmethod
-    def from_private(cls,
-                     private_key: 'PrivateKey',
-                     backend: 'BaseECCBackend' = None,
-                     ) -> 'PublicKey':
+    def from_private(
+        cls,
+        private_key: "PrivateKey",
+        backend: "BaseECCBackend" = None,
+    ) -> "PublicKey":
         if backend is None:
             backend = cls.get_backend()
         return backend.private_key_to_public_key(private_key)
 
     @classmethod
-    def recover_from_msg(cls,
-                         message: bytes,
-                         signature: 'Signature',
-                         backend: 'BaseECCBackend' = None,
-                         ) -> 'PublicKey':
+    def recover_from_msg(
+        cls,
+        message: bytes,
+        signature: "Signature",
+        backend: "BaseECCBackend" = None,
+    ) -> "PublicKey":
         message_hash = keccak(message)
         return cls.recover_from_msg_hash(message_hash, signature, backend)
 
     @classmethod
-    def recover_from_msg_hash(cls,
-                              message_hash: bytes,
-                              signature: 'Signature',
-                              backend: 'BaseECCBackend' = None,
-                              ) -> 'PublicKey':
+    def recover_from_msg_hash(
+        cls,
+        message_hash: bytes,
+        signature: "Signature",
+        backend: "BaseECCBackend" = None,
+    ) -> "PublicKey":
         if backend is None:
             backend = cls.get_backend()
         return backend.ecdsa_recover(message_hash, signature)
 
-    def verify_msg(self,
-                   message: bytes,
-                   signature: 'Signature',
-                   ) -> bool:
+    def verify_msg(
+        self,
+        message: bytes,
+        signature: "Signature",
+    ) -> bool:
         message_hash = keccak(message)
         return self.verify_msg_hash(message_hash, signature)
 
-    def verify_msg_hash(self,
-                        message_hash: bytes,
-                        signature: 'Signature',
-                        ) -> bool:
+    def verify_msg_hash(
+        self,
+        message_hash: bytes,
+        signature: "Signature",
+    ) -> bool:
         return self.backend.ecdsa_verify(message_hash, signature, self)
 
     def to_compressed_bytes(self) -> bytes:
@@ -242,12 +236,13 @@ class PublicKey(BaseKey, LazyBackend):
 
 
 class PrivateKey(BaseKey, LazyBackend):
-    public_key = None  # type: PublicKey
+    public_key: PublicKey = None
 
-    def __init__(self,
-                 private_key_bytes: bytes,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
-                 ) -> None:
+    def __init__(
+        self,
+        private_key_bytes: bytes,
+        backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
+    ) -> None:
         validate_private_key_bytes(private_key_bytes)
 
         self._raw_key = private_key_bytes
@@ -255,29 +250,32 @@ class PrivateKey(BaseKey, LazyBackend):
         self.public_key = self.backend.private_key_to_public_key(self)
         super().__init__(backend=backend)
 
-    def sign_msg(self, message: bytes) -> 'Signature':
+    def sign_msg(self, message: bytes) -> "Signature":
         message_hash = keccak(message)
         return self.sign_msg_hash(message_hash)
 
-    def sign_msg_hash(self, message_hash: bytes) -> 'Signature':
+    def sign_msg_hash(self, message_hash: bytes) -> "Signature":
         return self.backend.ecdsa_sign(message_hash, self)
 
-    def sign_msg_non_recoverable(self, message: bytes) -> 'NonRecoverableSignature':
+    def sign_msg_non_recoverable(self, message: bytes) -> "NonRecoverableSignature":
         message_hash = keccak(message)
         return self.sign_msg_hash_non_recoverable(message_hash)
 
-    def sign_msg_hash_non_recoverable(self, message_hash: bytes) -> 'NonRecoverableSignature':
+    def sign_msg_hash_non_recoverable(
+        self, message_hash: bytes
+    ) -> "NonRecoverableSignature":
         return self.backend.ecdsa_sign_non_recoverable(message_hash, self)
 
 
-class BaseSignature(ByteString, LazyBackend, ABC):
-    _r = None  # type: int
-    _s = None  # type: int
+class BaseSignature(LazyBackend, ABC):
+    _r: int = None
+    _s: int = None
 
-    def __init__(self,
-                 rs: Tuple[int, int],
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None
-                 ) -> None:
+    def __init__(
+        self,
+        rs: Tuple[int, int],
+        backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
+    ) -> None:
         for value in rs:
             try:
                 validate_signature_r_or_s(value)
@@ -319,20 +317,18 @@ class BaseSignature(ByteString, LazyBackend, ABC):
         return len(bytes(self))
 
     def __eq__(self, other: Any) -> bool:
-        if hasattr(other, 'to_bytes'):
+        if hasattr(other, "to_bytes"):
             return self.to_bytes() == other.to_bytes()
         elif is_bytes(other):
             return self.to_bytes() == other
         else:
             return False
 
-    # Must be typed with `ignore` due to
-    # https://github.com/python/mypy/issues/1237
-    def __getitem__(self, index: int) -> int:  # type: ignore
+    def __getitem__(self, index: int) -> int:
         return self.to_bytes()[index]
 
     def __repr__(self) -> str:
-        return "'{0}'".format(self.to_hex())
+        return f"'{self.to_hex()}'"
 
     def __index__(self) -> int:
         return self.__int__()
@@ -343,26 +339,23 @@ class BaseSignature(ByteString, LazyBackend, ABC):
     def __int__(self) -> int:
         return big_endian_to_int(self.to_bytes())
 
-    def verify_msg(self,
-                   message: bytes,
-                   public_key: PublicKey) -> bool:
+    def verify_msg(self, message: bytes, public_key: PublicKey) -> bool:
         message_hash = keccak(message)
         return self.verify_msg_hash(message_hash, public_key)
 
-    def verify_msg_hash(self,
-                        message_hash: bytes,
-                        public_key: PublicKey) -> bool:
+    def verify_msg_hash(self, message_hash: bytes, public_key: PublicKey) -> bool:
         return self.backend.ecdsa_verify(message_hash, self, public_key)
 
 
 class Signature(BaseSignature):
-    _v = None  # type: int
+    _v: int = None
 
-    def __init__(self,
-                 signature_bytes: bytes = None,
-                 vrs: Tuple[int, int, int] = None,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
-                 ) -> None:
+    def __init__(
+        self,
+        signature_bytes: bytes = None,
+        vrs: Tuple[int, int, int] = None,
+        backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
+    ) -> None:
         if bool(signature_bytes) is bool(vrs):
             raise TypeError("You must provide one of `signature_bytes` or `vrs`")
         elif signature_bytes:
@@ -371,7 +364,11 @@ class Signature(BaseSignature):
             s = big_endian_to_int(signature_bytes[32:64])
             v = ord(signature_bytes[64:65])
         elif vrs:
-            v, r, s, = vrs
+            (
+                v,
+                r,
+                s,
+            ) = vrs
         else:
             raise TypeError("Invariant: unreachable code path")
 
@@ -411,7 +408,7 @@ class Signature(BaseSignature):
         vb = int_to_byte(self.v)
         rb = pad32(int_to_big_endian(self.r))
         sb = pad32(int_to_big_endian(self.s))
-        return b''.join((rb, sb, vb))
+        return b"".join((rb, sb, vb))
 
     def recover_public_key_from_msg(self, message: bytes) -> PublicKey:
         message_hash = keccak(message)
@@ -420,17 +417,17 @@ class Signature(BaseSignature):
     def recover_public_key_from_msg_hash(self, message_hash: bytes) -> PublicKey:
         return self.backend.ecdsa_recover(message_hash, self)
 
-    def to_non_recoverable_signature(self) -> 'NonRecoverableSignature':
+    def to_non_recoverable_signature(self) -> "NonRecoverableSignature":
         return NonRecoverableSignature(rs=self.rs)
 
 
 class NonRecoverableSignature(BaseSignature):
-
-    def __init__(self,
-                 signature_bytes: bytes = None,
-                 rs: Tuple[int, int] = None,
-                 backend: 'Union[BaseECCBackend, Type[BaseECCBackend], str, None]' = None,
-                 ) -> None:
+    def __init__(
+        self,
+        signature_bytes: bytes = None,
+        rs: Tuple[int, int] = None,
+        backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
+    ) -> None:
         if signature_bytes is None and rs is None:
             raise TypeError("You must provide one of `signature_bytes` or `vr`")
         elif signature_bytes:
@@ -445,7 +442,4 @@ class NonRecoverableSignature(BaseSignature):
         super().__init__(rs=(r, s), backend=backend)
 
     def to_bytes(self) -> bytes:
-        return b''.join(
-            pad32(int_to_big_endian(value))
-            for value in self.rs
-        )
+        return b"".join(pad32(int_to_big_endian(value)) for value in self.rs)

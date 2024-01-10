@@ -1,78 +1,79 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from setuptools import (
-    setup,
     find_packages,
+    setup,
 )
 
-
-deps = {
-    'coincurve': [
-        'coincurve>=7.0.0,<16.0.0',
+extras_require = {
+    "coincurve": [
+        "coincurve>=12.0.0",
     ],
-    'eth-keys': [
-        "eth-utils>=2.0.0,<3.0.0",
-        "eth-typing>=3.0.0,<4",
+    "dev": [
+        "build>=0.9.0",
+        "bumpversion>=0.5.3",
+        "ipython",
+        "pre-commit>=3.4.0",
+        "tox>=4.0.0",
+        "twine",
+        "wheel",
     ],
-    'test': [
-        "asn1tools>=0.146.2,<0.147",
-        "factory-boy>=3.0.1,<3.1",
-        "pyasn1>=0.4.5,<0.5",
-        "pytest==6.2.5",
-        "hypothesis>=5.10.3, <6.0.0",
-        "eth-hash[pysha3];implementation_name=='cpython'",
-        "eth-hash[pycryptodome];implementation_name=='pypy'",
+    "docs": [
+        "towncrier>=21,<22",
     ],
-    'lint': [
-        'flake8==3.0.4',
-        'mypy==0.782',
-    ],
-    'dev': [
-        'tox==3.20.0',
-        'bumpversion==0.5.3',
-        'twine',
+    "test": [
+        "pytest>=7.0.0",
+        "asn1tools>=0.146.2",
+        "factory-boy>=3.0.1",
+        "pyasn1>=0.4.5",
+        "hypothesis>=5.10.3,<6",
+        "eth-hash[pysha3]",
     ],
 }
 
-deps['dev'] = (
-    deps['dev'] +
-    deps['eth-keys'] +
-    deps['lint'] +
-    deps['test']
+extras_require["dev"] = (
+    extras_require["coincurve"]
+    + extras_require["dev"]
+    + extras_require["docs"]
+    + extras_require["test"]
 )
 
-with open('./README.md') as readme:
+
+with open("./README.md") as readme:
     long_description = readme.read()
 
+
 setup(
-    name='eth-keys',
-    # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
-    version='0.4.0',
-    description="""Common API for Ethereum key operations.""",
+    name="eth-keys",
+    # *IMPORTANT*: Don't manually change the version here. Use `make bump`, as described in readme
+    version="0.4.0",
+    description="""eth-keys: Common API for Ethereum key operations""",
     long_description=long_description,
-    long_description_content_type='text/markdown',
-    author='Piper Merriam',
-    author_email='pipermerriam@gmail.com',
-    url='https://github.com/ethereum/eth-keys',
+    long_description_content_type="text/markdown",
+    author="The Ethereum Foundation",
+    author_email="snakecharmers@ethereum.org",
+    url="https://github.com/ethereum/eth-keys",
     include_package_data=True,
-    install_requires=deps['eth-keys'],
-    py_modules=['eth_keys'],
-    extras_require=deps,
+    install_requires=[
+        "eth-utils>=2",
+        "eth-typing>=3",
+    ],
+    python_requires=">=3.8, <4",
+    extras_require=extras_require,
+    py_modules=["eth_keys"],
     license="MIT",
     zip_safe=False,
-    package_data={'eth_keys': ['py.typed']},
-    keywords='ethereum',
+    keywords="ethereum",
     packages=find_packages(exclude=["tests", "tests.*"]),
+    package_data={"eth_keys": ["py.typed"]},
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )

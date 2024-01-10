@@ -1,17 +1,19 @@
+from eth_utils import (
+    ValidationError,
+    keccak,
+)
 import pytest
 
-from eth_utils import (
-    keccak,
-    ValidationError,
+from eth_keys import (
+    KeyAPI,
+)
+from eth_keys.backends import (
+    NativeECCBackend,
 )
 
-from eth_keys import KeyAPI
-from eth_keys.backends import NativeECCBackend
-
-
-MSG = b'message'
+MSG = b"message"
 MSGHASH = keccak(MSG)
-PK_BYTES = b'\x01' * 32
+PK_BYTES = b"\x01" * 32
 
 
 @pytest.fixture

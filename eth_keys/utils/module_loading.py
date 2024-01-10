@@ -1,6 +1,11 @@
+from importlib import (
+    import_module,
+)
 import operator
-from typing import (Any, Tuple)
-from importlib import import_module
+from typing import (
+    Any,
+    Tuple,
+)
 
 
 def import_string(dotted_path: str) -> Any:
@@ -10,9 +15,9 @@ def import_string(dotted_path: str) -> Any:
     last name in the path. Raise ImportError if the import failed.
     """
     try:
-        module_path, class_name = dotted_path.rsplit('.', 1)
+        module_path, class_name = dotted_path.rsplit(".", 1)
     except ValueError:
-        msg = "%s doesn't look like a module path" % dotted_path
+        msg = f"{dotted_path} doesn't look like a module path"
         raise ImportError(msg)
 
     module = import_module(module_path)
@@ -20,18 +25,17 @@ def import_string(dotted_path: str) -> Any:
     try:
         return getattr(module, class_name)
     except AttributeError:
-        msg = 'Module "%s" does not define a "%s" attribute/class' % (
-            module_path, class_name)
+        msg = f'Module "{module_path}" does not define a "{class_name}" attribute/class'
         raise ImportError(msg)
 
 
 def split_at_longest_importable_path(dotted_path: str) -> Tuple[str, str]:
-    num_path_parts = len(dotted_path.split('.'))
+    num_path_parts = len(dotted_path.split("."))
 
     for i in range(1, num_path_parts):
-        path_parts = dotted_path.rsplit('.', i)
+        path_parts = dotted_path.rsplit(".", i)
         import_part = path_parts[0]
-        remainder = '.'.join(path_parts[1:])
+        remainder = ".".join(path_parts[1:])
 
         try:
             module = import_module(import_part)
@@ -42,11 +46,9 @@ def split_at_longest_importable_path(dotted_path: str) -> Tuple[str, str]:
             operator.attrgetter(remainder)(module)
         except AttributeError:
             raise ImportError(
-                "Unable to derive appropriate import path for {0}".format(
-                    dotted_path,
-                )
+                f"Unable to derive appropriate import path for {dotted_path}"
             )
         else:
             return import_part, remainder
     else:
-        return '', dotted_path
+        return "", dotted_path

@@ -1,8 +1,9 @@
 # Non-recoverable signatures are encoded using a DER sequence of two integers
 # We locally implement serialization and deserialization for this specific spec
 #   with constrained inputs.
-# This is done locally to avoid importing a 3rd-party library, in this very sensitive project.
-# asn1tools and pyasn1 were used as reference APIs, see how in tests/core/test_utils_asn1.py
+# This is done locally to avoid importing a 3rd-party library, in this very sensitive
+# project. asn1tools and pyasn1 were used as reference APIs, see how in
+# tests/core/test_utils_asn1.py
 #
 # See more about DER encodings, and ASN.1 in general, here:
 # http://luca.ntop.org/Teaching/Appunti/asn1.html
@@ -73,14 +74,19 @@ def two_int_sequence_decoder(encoded: bytes) -> Tuple[int, int]:
     See: https://docs.microsoft.com/en-us/windows/desktop/seccertenroll/about-sequence
     """
     if encoded[0] != 0x30:
-        raise ValueError("Encoded sequence must start with 0x30 byte, but got %s" % encoded[0])
+        raise ValueError(
+            f"Encoded sequence must start with 0x30 byte, but got {encoded[0]}"
+        )
 
     # skip sequence length
     int1, rest = _decode_int(encoded[2:])
     int2, empty = _decode_int(rest)
 
     if len(empty) != 0:
-        raise ValueError("Encoded sequence must not contain any trailing data, but had %r" % empty)
+        raise ValueError(
+            "Encoded sequence must not contain any trailing data, but had "
+            f"{repr(empty)}"
+        )
 
     return int1, int2
 
@@ -94,7 +100,8 @@ def _encode_int(primitive: int) -> Iterator[int]:
 
     encoded = int_to_big_endian(primitive)
     if encoded[0] >= 128:
-        # Indicate that integer is positive (it always is, but doesn't always need the flag)
+        # Indicate that integer is positive
+        # (it always is, but doesn't always need the flag)
         yield len(encoded) + 1
         yield 0x00
     else:
@@ -108,11 +115,12 @@ def _decode_int(encoded: bytes) -> Tuple[int, bytes]:
 
     if encoded[0] != 0x02:
         raise ValueError(
-            "Encoded value must be an integer, starting with on 0x02 byte, but got %s" % encoded[0]
+            "Encoded value must be an integer, starting with on 0x02 byte, but got "
+            f"{encoded[0]}"
         )
 
     length = encoded[1]
     # to_int can handle leading zeros
-    decoded_int = big_endian_to_int(encoded[2:2 + length])
+    decoded_int = big_endian_to_int(encoded[2 : 2 + length])
 
-    return decoded_int, encoded[2 + length:]
+    return decoded_int, encoded[2 + length :]

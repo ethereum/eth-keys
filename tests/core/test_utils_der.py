@@ -1,21 +1,19 @@
-import itertools
-import pytest
-
 import asn1tools
 from hypothesis import (
     example,
+    given,
     settings,
     strategies as st,
-    given,
 )
 from pyasn1.codec.der import (
-    encoder as pyasn1_encoder,
     decoder as pyasn1_decoder,
+    encoder as pyasn1_encoder,
 )
 from pyasn1.type import (
-    univ,
     namedtype,
+    univ,
 )
+import pytest
 
 from eth_keys.utils.der import (
     two_int_sequence_decoder,
@@ -44,8 +42,8 @@ def asn1tools_decode(encoded):
 
 class TwoInts(univ.Sequence):
     componentType = namedtype.NamedTypes(
-        namedtype.NamedType('r', univ.Integer()),
-        namedtype.NamedType('s', univ.Integer()),
+        namedtype.NamedType("r", univ.Integer()),
+        namedtype.NamedType("s", univ.Integer()),
     )
 
 
@@ -61,11 +59,12 @@ def pyasn1_decode(encoded):
     return decoded[0]["r"], decoded[0]["s"]
 
 
-MAX_32_BYTE_INT = 256 ** 32 - 1
+MAX_32_BYTE_INT = 256**32 - 1
 uint32strategy = st.integers(min_value=0, max_value=MAX_32_BYTE_INT)
 
+
 @pytest.mark.parametrize(
-    'encoder, decoder',
+    "encoder, decoder",
     (
         (two_int_sequence_encoder, asn1tools_decode),
         (two_int_sequence_encoder, pyasn1_decode),
@@ -74,11 +73,11 @@ uint32strategy = st.integers(min_value=0, max_value=MAX_32_BYTE_INT)
         (pyasn1_encode, two_int_sequence_decoder),
     ),
     ids=(
-        'local_encode=>asn1tools_decode',
-        'local_encode=>pyasn1_decode',
-        'local_encode=>local_decode',
-        'asn1tools_encode=>local_decode',
-        'pyasn1_encode=>local_decode',
+        "local_encode=>asn1tools_decode",
+        "local_encode=>pyasn1_decode",
+        "local_encode=>local_decode",
+        "asn1tools_encode=>local_decode",
+        "pyasn1_encode=>local_decode",
     ),
 )
 @given(

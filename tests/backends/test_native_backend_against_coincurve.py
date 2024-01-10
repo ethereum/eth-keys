@@ -1,42 +1,41 @@
-import pytest
-
+from eth_utils import (
+    keccak,
+)
 from hypothesis import (
     given,
     settings,
     strategies as st,
 )
-
-from eth_utils import (
-    keccak,
+import pytest
+from strategies import (
+    message_hash_st,
+    private_key_st,
+    signature_st,
 )
 
+from eth_keys import (
+    KeyAPI,
+)
+from eth_keys.backends import (
+    CoinCurveECCBackend,
+    NativeECCBackend,
+)
 from eth_keys.exceptions import (
     BadSignature,
 )
 
-from eth_keys import KeyAPI
-from eth_keys.backends import CoinCurveECCBackend
-from eth_keys.backends import NativeECCBackend
-
-from strategies import (
-    private_key_st,
-    message_hash_st,
-    signature_st,
-)
-
-
-MSG = b'message'
+MSG = b"message"
 MSGHASH = keccak(MSG)
 
 MAX_EXAMPLES = 200
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def native_key_api():
     return KeyAPI(backend=NativeECCBackend())
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def coincurve_key_api():
     return KeyAPI(backend=CoinCurveECCBackend())
 
@@ -45,9 +44,9 @@ def coincurve_key_api():
     private_key_bytes=private_key_st,
 )
 @settings(max_examples=MAX_EXAMPLES)
-def test_public_key_generation_is_equal(private_key_bytes,
-                                        native_key_api,
-                                        coincurve_key_api):
+def test_public_key_generation_is_equal(
+    private_key_bytes, native_key_api, coincurve_key_api
+):
     native_public_key = native_key_api.PrivateKey(private_key_bytes).public_key
     coincurve_public_key = coincurve_key_api.PrivateKey(private_key_bytes).public_key
 
@@ -59,10 +58,9 @@ def test_public_key_generation_is_equal(private_key_bytes,
     message_hash=message_hash_st,
 )
 @settings(max_examples=MAX_EXAMPLES)
-def test_signing_is_equal(private_key_bytes,
-                          message_hash,
-                          native_key_api,
-                          coincurve_key_api):
+def test_signing_is_equal(
+    private_key_bytes, message_hash, native_key_api, coincurve_key_api
+):
     native_private_key = native_key_api.PrivateKey(private_key_bytes)
     native_signature = native_key_api.ecdsa_sign(message_hash, native_private_key)
     native_non_recoverable_signature = native_key_api.ecdsa_sign_non_recoverable(
@@ -71,7 +69,9 @@ def test_signing_is_equal(private_key_bytes,
     )
 
     coincurve_private_key = coincurve_key_api.PrivateKey(private_key_bytes)
-    coincurve_signature = coincurve_key_api.ecdsa_sign(message_hash, coincurve_private_key)
+    coincurve_signature = coincurve_key_api.ecdsa_sign(
+        message_hash, coincurve_private_key
+    )
     coincurve_non_recoverable_signature = coincurve_key_api.ecdsa_sign_non_recoverable(
         message_hash,
         coincurve_private_key,
@@ -85,24 +85,22 @@ def test_signing_is_equal(private_key_bytes,
     private_key_bytes=private_key_st,
     message_hash=message_hash_st,
     direction=st.one_of(
-        st.just('coincurve-to-native'),
-        st.just('native-to-coincurve'),
+        st.just("coincurve-to-native"),
+        st.just("native-to-coincurve"),
     ),
 )
 @settings(max_examples=MAX_EXAMPLES)
-def test_native_to_coincurve_recover(private_key_bytes,
-                                     message_hash,
-                                     direction,
-                                     native_key_api,
-                                     coincurve_key_api):
-    if direction == 'coincurve-to-native':
+def test_native_to_coincurve_recover(
+    private_key_bytes, message_hash, direction, native_key_api, coincurve_key_api
+):
+    if direction == "coincurve-to-native":
         backend_a = coincurve_key_api
         backend_b = native_key_api
-    elif direction == 'native-to-coincurve':
+    elif direction == "native-to-coincurve":
         backend_b = coincurve_key_api
         backend_a = native_key_api
     else:
-        assert False, "invariant"
+        raise AssertionError("invariant")
 
     private_key_a = backend_a.PrivateKey(private_key_bytes)
     public_key_a = private_key_a.public_key
@@ -117,24 +115,22 @@ def test_native_to_coincurve_recover(private_key_bytes,
     message_hash=message_hash_st,
     signature_bytes=signature_st,
     direction=st.one_of(
-        st.just('coincurve-to-native'),
-        st.just('native-to-coincurve'),
+        st.just("coincurve-to-native"),
+        st.just("native-to-coincurve"),
     ),
 )
 @settings(max_examples=MAX_EXAMPLES)
-def test_coincurve_to_native_invalid_signatures(message_hash,
-                                                signature_bytes,
-                                                direction,
-                                                native_key_api,
-                                                coincurve_key_api):
-    if direction == 'coincurve-to-native':
+def test_coincurve_to_native_invalid_signatures(
+    message_hash, signature_bytes, direction, native_key_api, coincurve_key_api
+):
+    if direction == "coincurve-to-native":
         backend_a = coincurve_key_api
         backend_b = native_key_api
-    elif direction == 'native-to-coincurve':
+    elif direction == "native-to-coincurve":
         backend_b = coincurve_key_api
         backend_a = native_key_api
     else:
-        assert False, "invariant"
+        raise AssertionError("invariant")
 
     try:
         signature_a = backend_a.Signature(signature_bytes)
@@ -167,9 +163,9 @@ def test_coincurve_to_native_invalid_signatures(message_hash,
 @given(
     private_key_bytes=private_key_st,
 )
-def test_public_key_compression_is_equal(private_key_bytes,
-                                         native_key_api,
-                                         coincurve_key_api):
+def test_public_key_compression_is_equal(
+    private_key_bytes, native_key_api, coincurve_key_api
+):
     native_public_key = native_key_api.PrivateKey(private_key_bytes).public_key
     coincurve_public_key = coincurve_key_api.PrivateKey(private_key_bytes).public_key
 
@@ -182,13 +178,17 @@ def test_public_key_compression_is_equal(private_key_bytes,
 @given(
     private_key_bytes=private_key_st,
 )
-def test_public_key_decompression_is_equal(private_key_bytes,
-                                           native_key_api,
-                                           coincurve_key_api):
+def test_public_key_decompression_is_equal(
+    private_key_bytes, native_key_api, coincurve_key_api
+):
     public_key_template = coincurve_key_api.PrivateKey(private_key_bytes).public_key
     compressed_public_key = public_key_template.to_compressed_bytes()
 
-    native_public_key = native_key_api.PublicKey.from_compressed_bytes(compressed_public_key)
-    coincurve_public_key = coincurve_key_api.PublicKey.from_compressed_bytes(compressed_public_key)
+    native_public_key = native_key_api.PublicKey.from_compressed_bytes(
+        compressed_public_key
+    )
+    coincurve_public_key = coincurve_key_api.PublicKey.from_compressed_bytes(
+        compressed_public_key
+    )
 
     assert native_public_key == coincurve_public_key
