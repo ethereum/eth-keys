@@ -1,3 +1,24 @@
+eth-keys v0.5.0 (2024-01-10)
+----------------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- Drop python 3.6 and 3.7 support (`#96 <https://github.com/ethereum/eth-keys/issues/96>`__)
+
+
+Features
+~~~~~~~~
+
+- Add python 3.11 support (`#96 <https://github.com/ethereum/eth-keys/issues/96>`__)
+
+
+Internal Changes - for eth-keys Contributors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Merge template updates, notably using ``pre-commit`` for linting and change the name of the ``master`` branch to ``main`` (`#96 <https://github.com/ethereum/eth-keys/issues/96>`__)
+
+
 v0.4.0
 ------
 
