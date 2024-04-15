@@ -31,7 +31,10 @@ lint:
 	)
 
 test:
-	pytest tests
+	python -m pytest tests
+
+autobuild-docs:
+	sphinx-autobuild --open-browser docs docs/_build/html
 
 docs:
 	python ./newsfragments/validate_files.py
@@ -42,7 +45,7 @@ ifndef bump
 	$(error bump must be set, typically: major, minor, patch, or devnum)
 endif
 
-notes: check-bump
+notes: check-bump validate-newsfragments
 	# Let UPCOMING_VERSION be the version that is used for the current bump
 	$(eval UPCOMING_VERSION=$(shell bumpversion $(bump) --dry-run --list | grep new_version= | sed 's/new_version=//g'))
 	# Now generate the release notes to have them included in the release commit
@@ -53,7 +56,7 @@ notes: check-bump
 
 release: check-bump clean
 	# require that upstream is configured for ethereum/eth-keys
-	@git remote -v | grep -E "upstream\tgit@github.com:ethereum/eth-keys.git \(push\)|upstream\thttps://(www.)?github.com/ethereum/eth-keys \(push\)"
+	@git remote -v | grep "upstream[[:space:]]git@github.com:ethereum/eth-keys.git (push)\|upstream[[:space:]]https://github.com/ethereum/eth-keys (push)"
 	# verify that docs build correctly
 	./newsfragments/validate_files.py is-empty
 	make docs
