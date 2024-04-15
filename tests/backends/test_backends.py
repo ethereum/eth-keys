@@ -1,4 +1,5 @@
 import os
+import pytest
 
 from eth_utils import (
     keccak,
@@ -6,7 +7,6 @@ from eth_utils import (
 from hypothesis import (
     given,
 )
-import pytest
 from strategies import (
     message_hash_st,
     private_key_st,

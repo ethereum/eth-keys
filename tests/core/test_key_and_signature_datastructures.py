@@ -1,3 +1,5 @@
+import pytest
+
 from eth_utils import (
     ValidationError,
     decode_hex,
@@ -8,7 +10,6 @@ from eth_utils import (
     is_same_address,
     keccak,
 )
-import pytest
 
 from eth_keys import (
     KeyAPI,
