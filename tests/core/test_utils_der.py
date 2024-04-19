@@ -1,3 +1,5 @@
+import pytest
+
 import asn1tools
 from hypothesis import (
     example,
@@ -13,7 +15,6 @@ from pyasn1.type import (
     namedtype,
     univ,
 )
-import pytest
 
 from eth_keys.utils.der import (
     two_int_sequence_decoder,

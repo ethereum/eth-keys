@@ -25,7 +25,7 @@ extras_require = {
         "asn1tools>=0.146.2",
         "factory-boy>=3.0.1",
         "pyasn1>=0.4.5",
-        "hypothesis>=5.10.3,<6",
+        "hypothesis>=5.10.3",
         "eth-hash[pysha3]",
     ],
 }
@@ -75,5 +75,6 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
 )

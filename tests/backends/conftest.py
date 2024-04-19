@@ -1,8 +1,9 @@
+import pytest
+
 from eth_utils import (
     decode_hex,
     keccak,
 )
-import pytest
 
 MSG = b"message"
 MSGHASH = keccak(MSG)

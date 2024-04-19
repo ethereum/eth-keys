@@ -48,3 +48,8 @@ repos:
     hooks:
     -   id: mypy
         exclude: tests/
+-   repo: https://github.com/PrincetonUniversity/blocklint
+    rev: v0.2.5
+    hooks:
+    -   id: blocklint
+        exclude: 'docs/Makefile|CHANGELOG.rst|tox.ini'

@@ -13,7 +13,7 @@ from eth_keys.utils.padding import (
 )
 
 private_key_st = (
-    st.integers(min_value=1, max_value=SECPK1_N)
+    st.integers(min_value=1, max_value=SECPK1_N - 1)
     .map(
         int_to_big_endian,
     )

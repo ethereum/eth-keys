@@ -1,8 +1,9 @@
+import pytest
+
 from eth_utils import (
     ValidationError,
     keccak,
 )
-import pytest
 
 from eth_keys import (
     KeyAPI,
