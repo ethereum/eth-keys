@@ -1,3 +1,12 @@
+eth-keys v0.5.1 (2024-04-23)
+----------------------------
+
+Internal Changes - for eth-keys Contributors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Merge template updates, notably adding python 3.12 support. Fix docs CI build. (`#99 <https://github.com/ethereum/eth-keys/issues/99>`__)
+
+
 eth-keys v0.5.0 (2024-01-10)
 ----------------------------
 
