@@ -152,11 +152,11 @@ def ecdsa_raw_verify(
 
 def ecdsa_raw_recover(msg_hash: bytes, vrs: Tuple[int, int, int]) -> bytes:
     v, r, s = vrs
+
+    if v not in (0, 1):
+        raise BadSignature(f"{v} must be either 0 or 1")
+
     v += 27
-
-    if not (27 <= v <= 34):
-        raise BadSignature(f"{v} must in range 27-31")
-
     x = r
 
     xcubedaxb = (x * x * x + A * x + B) % P
