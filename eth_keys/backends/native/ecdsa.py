@@ -154,7 +154,7 @@ def ecdsa_raw_recover(msg_hash: bytes, vrs: Tuple[int, int, int]) -> bytes:
     v, r, s = vrs
 
     if v not in (0, 1):
-        raise BadSignature(f"{v} must be either 0 or 1")
+        raise BadSignature(f"value of v, aka y-parity, was {v}, must be either 0 or 1")
 
     v += 27
     x = r
