@@ -1,1 +1,0 @@
-Set ``ecdsa_raw_recover`` to accept ``v`` values of 0 or 1

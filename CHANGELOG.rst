@@ -1,3 +1,12 @@
+eth-keys v0.6.0 (2024-10-21)
+----------------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- Set ``ecdsa_raw_recover`` to accept ``v`` values of 0 or 1 (`#100 <https://github.com/ethereum/eth-keys/issues/100>`__)
+
+
 eth-keys v0.5.1 (2024-04-23)
 ----------------------------
 
