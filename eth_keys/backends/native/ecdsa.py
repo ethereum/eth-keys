@@ -121,7 +121,8 @@ def deterministic_generate_k(
 
 def ecdsa_raw_sign(msg_hash: bytes, private_key_bytes: bytes) -> Tuple[int, int, int]:
     z = big_endian_to_int(msg_hash)
-    k = deterministic_generate_k(msg_hash, private_key_bytes)
+    msg_hash_mod_n = pad32(int_to_big_endian(z % N))
+    k = deterministic_generate_k(msg_hash_mod_n, private_key_bytes)
 
     r, y = fast_multiply(G, k)
     s_raw = inv(k, N) * (z + r * big_endian_to_int(private_key_bytes)) % N
