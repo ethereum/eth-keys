@@ -11,7 +11,7 @@ Common API for Ethereum key operations
 
 Read more in the documentation below. [View the change log](https://github.com/ethereum/eth-keys/blob/main/CHANGELOG.rst).
 
-## Quickstart
+## Installation
 
 ```sh
 python -m pip install eth-keys
