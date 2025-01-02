@@ -393,12 +393,6 @@ jobs:
       - image: cimg/python:3.12
         environment:
           TOXENV: py312-backends-coincurve19
-  py313-backends-coincurve19:
-    <<: *common
-    docker:
-      - image: cimg/python:3.13
-        environment:
-          TOXENV: py313-backends-coincurve19
 
   py38-backends-coincurve20:
     <<: *common
@@ -480,7 +474,6 @@ define: &all_jobs
   - py310-backends-coincurve19
   - py311-backends-coincurve19
   - py312-backends-coincurve19
-  - py313-backends-coincurve19
   - py38-backends-coincurve20
   - py39-backends-coincurve20
   - py310-backends-coincurve20
