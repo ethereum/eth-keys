@@ -1,3 +1,12 @@
+eth-keys v0.6.1 (2025-01-14)
+----------------------------
+
+Features
+~~~~~~~~
+
+- Merge template, adding ``py313`` and ``coincurve v20`` support, replace ``bumpversion`` with ``bump-my-version``. (`#103 <https://github.com/ethereum/eth-keys/issues/103>`__)
+
+
 eth-keys v0.6.0 (2024-10-21)
 ----------------------------
 
