@@ -14,8 +14,6 @@ help:
 	@echo "notes - consume towncrier newsfragments/ and update CHANGELOG - requires bump to be set"
 	@echo "release - package and upload a release (does not run notes target) - requires bump to be set"
 
-clean: clean-build clean-pyc
-
 clean-build:
 	rm -fr build/
 	rm -fr dist/
