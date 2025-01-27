@@ -1,9 +1,11 @@
 import pytest
 
 from eth_utils import (
+    int_to_big_endian,
     keccak,
 )
 from hypothesis import (
+    example,
     given,
     settings,
     strategies as st,
@@ -21,8 +23,14 @@ from eth_keys.backends import (
     CoinCurveECCBackend,
     NativeECCBackend,
 )
+from eth_keys.constants import (
+    SECPK1_N,
+)
 from eth_keys.exceptions import (
     BadSignature,
+)
+from eth_keys.utils.padding import (
+    pad32,
 )
 
 MSG = b"message"
@@ -57,6 +65,10 @@ def test_public_key_generation_is_equal(
 @given(
     private_key_bytes=private_key_st,
     message_hash=message_hash_st,
+)
+@example(
+    private_key_bytes=pad32(int_to_big_endian(1)),
+    message_hash=int_to_big_endian(SECPK1_N),
 )
 @settings(max_examples=MAX_EXAMPLES)
 def test_signing_is_equal(
