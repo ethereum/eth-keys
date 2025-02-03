@@ -1,0 +1,1 @@
+Move ``tools`` folder into ``tests`` as that's the only place it's used.
