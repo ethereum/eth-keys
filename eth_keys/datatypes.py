@@ -245,8 +245,9 @@ class PrivateKey(BaseKey, LazyBackend):
 
         self._raw_key = private_key_bytes
 
-        self.public_key = self.backend.private_key_to_public_key(self)
         super().__init__(backend=backend)
+
+        self.public_key = self.backend.private_key_to_public_key(self)
 
     def sign_msg(self, message: bytes) -> "Signature":
         message_hash = keccak(message)
