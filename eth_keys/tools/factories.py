@@ -34,5 +34,5 @@ class PublicKeyFactory(factory.Factory):  # type: ignore
         model = keys.PublicKey
 
     public_key_bytes = factory.LazyFunction(
-        lambda: PrivateKeyFactory().public_key.to_bytes()
+        lambda: PrivateKeyFactory().public_key.to_bytes() # type: ignore[attr-defined]
     )
