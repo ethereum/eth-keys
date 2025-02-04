@@ -26,8 +26,9 @@ class PrivateKeyFactory(factory.Factory):  # type: ignore
     class Meta:
         model = keys.PrivateKey
 
-    private_key_bytes = factory.LazyFunction(lambda: _mk_random_bytes(32))  # type: ignore
-
+    private_key_bytes = factory.LazyFunction(  # type: ignore
+        lambda: _mk_random_bytes(32)
+    )
 
 class PublicKeyFactory(factory.Factory):  # type: ignore
     class Meta:
