@@ -236,8 +236,6 @@ class PublicKey(BaseKey, LazyBackend):
 
 
 class PrivateKey(BaseKey, LazyBackend):
-    public_key: PublicKey = None
-
     def __init__(
         self,
         private_key_bytes: bytes,
