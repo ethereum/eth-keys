@@ -30,6 +30,7 @@ class PrivateKeyFactory(factory.Factory):  # type: ignore
         lambda: _mk_random_bytes(32)
     )
 
+
 class PublicKeyFactory(factory.Factory):  # type: ignore
     class Meta:
         model = keys.PublicKey
