@@ -1,0 +1,1 @@
+Drops support for ``coincurve<=16``, adds support for ``coincurve==21``.

@@ -266,59 +266,6 @@ jobs:
       - <<: *run-tox-step
       - <<: *save-cache-step
 
-  py38-backends-coincurve12:
-    <<: *common
-    docker:
-      - image: cimg/python:3.8
-        environment:
-          TOXENV: py38-backends-coincurve12
-
-  py38-backends-coincurve13:
-    <<: *common
-    docker:
-      - image: cimg/python:3.8
-        environment:
-          TOXENV: py38-backends-coincurve13
-
-  py38-backends-coincurve14:
-    <<: *common
-    docker:
-      - image: cimg/python:3.8
-        environment:
-          TOXENV: py38-backends-coincurve14
-
-  py38-backends-coincurve15:
-    <<: *common
-    docker:
-      - image: cimg/python:3.8
-        environment:
-          TOXENV: py38-backends-coincurve15
-  py39-backends-coincurve15:
-    <<: *common
-    docker:
-      - image: cimg/python:3.9
-        environment:
-          TOXENV: py39-backends-coincurve15
-
-  py38-backends-coincurve16:
-    <<: *common
-    docker:
-      - image: cimg/python:3.8
-        environment:
-          TOXENV: py38-backends-coincurve16
-  py39-backends-coincurve16:
-    <<: *common
-    docker:
-      - image: cimg/python:3.9
-        environment:
-          TOXENV: py39-backends-coincurve16
-  py310-backends-coincurve16:
-    <<: *common
-    docker:
-      - image: cimg/python:3.10
-        environment:
-          TOXENV: py310-backends-coincurve16
-
   py38-backends-coincurve17:
     <<: *common
     docker:
@@ -431,6 +378,37 @@ jobs:
         environment:
           TOXENV: py313-backends-coincurve20
 
+  py39-backends-coincurve21:
+    <<: *common
+    docker:
+      - image: cimg/python:3.9
+        environment:
+          TOXENV: py39-backends-coincurve21
+  py310-backends-coincurve21:
+    <<: *common
+    docker:
+      - image: cimg/python:3.10
+        environment:
+          TOXENV: py310-backends-coincurve21
+  py311-backends-coincurve21:
+    <<: *common
+    docker:
+      - image: cimg/python:3.11
+        environment:
+          TOXENV: py311-backends-coincurve21
+  py312-backends-coincurve21:
+    <<: *common
+    docker:
+      - image: cimg/python:3.12
+        environment:
+          TOXENV: py312-backends-coincurve21
+  py313-backends-coincurve21:
+    <<: *common
+    docker:
+      - image: cimg/python:3.13
+        environment:
+          TOXENV: py313-backends-coincurve21
+
 define: &all_jobs
   - docs
   - py38-core
@@ -454,14 +432,6 @@ define: &all_jobs
   - py311-windows-wheel
   - py312-windows-wheel
   - py313-windows-wheel
-  - py38-backends-coincurve12
-  - py38-backends-coincurve13
-  - py38-backends-coincurve14
-  - py38-backends-coincurve15
-  - py39-backends-coincurve15
-  - py38-backends-coincurve16
-  - py39-backends-coincurve16
-  - py310-backends-coincurve16
   - py38-backends-coincurve17
   - py39-backends-coincurve17
   - py310-backends-coincurve17
@@ -480,6 +450,11 @@ define: &all_jobs
   - py311-backends-coincurve20
   - py312-backends-coincurve20
   - py313-backends-coincurve20
+  - py39-backends-coincurve21
+  - py310-backends-coincurve21
+  - py311-backends-coincurve21
+  - py312-backends-coincurve21
+  - py313-backends-coincurve21
 
 workflows:
   version: 2
