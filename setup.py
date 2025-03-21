@@ -6,7 +6,7 @@ from setuptools import (
 
 extras_require = {
     "coincurve": [
-        "coincurve>=12.0.0",
+        "coincurve>=17.0.0",
     ],
     "dev": [
         "build>=0.9.0",
