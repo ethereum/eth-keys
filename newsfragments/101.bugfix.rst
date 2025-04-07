@@ -1,1 +1,0 @@
-Modulo reduce the message digest before passing it to the HMAC function

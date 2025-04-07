@@ -1,3 +1,20 @@
+eth-keys v0.7.0 (2025-04-07)
+----------------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- Move ``tools`` folder into ``tests`` as that's the only place it's used. (`#105 <https://github.com/ethereum/eth-keys/issues/105>`__)
+- Drops support for ``coincurve<=16``, adds support for ``coincurve==21``. (`#108 <https://github.com/ethereum/eth-keys/issues/108>`__)
+
+
+Bugfixes
+~~~~~~~~
+
+- Modulo reduce the message digest before passing it to the HMAC function (`#101 <https://github.com/ethereum/eth-keys/issues/101>`__)
+- Makes ``PrivateKey.public_key`` explicitly an instance member instead of looking like it's a class member. (`#106 <https://github.com/ethereum/eth-keys/issues/106>`__)
+
+
 eth-keys v0.6.1 (2025-01-14)
 ----------------------------
 

@@ -1,1 +1,0 @@
-Makes ``PrivateKey.public_key`` explicitly an instance member instead of looking like it's a class member.
