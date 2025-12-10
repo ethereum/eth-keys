@@ -1,7 +1,4 @@
 import os
-from typing import (
-    Type,
-)
 
 from eth_keys.utils.module_loading import (
     import_string,
