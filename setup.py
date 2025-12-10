@@ -7,6 +7,9 @@ from setuptools import (
 extras_require = {
     "coincurve": [
         "coincurve>=17.0.0",
+        # Coincurve v21.0.0 is broken with python 3.14.
+        # See issue: https://github.com/ofek/coincurve/issues/219
+        "coincurve>=20.0.0,<21.0.0;python_version=='3.14'",
     ],
     "dev": [
         "build>=0.9.0",

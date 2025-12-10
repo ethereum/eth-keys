@@ -4,7 +4,6 @@ from importlib import (
 import operator
 from typing import (
     Any,
-    Tuple,
 )
 
 
@@ -29,7 +28,7 @@ def import_string(dotted_path: str) -> Any:
         raise ImportError(msg)
 
 
-def split_at_longest_importable_path(dotted_path: str) -> Tuple[str, str]:
+def split_at_longest_importable_path(dotted_path: str) -> tuple[str, str]:
     num_path_parts = len(dotted_path.split("."))
 
     for i in range(1, num_path_parts):

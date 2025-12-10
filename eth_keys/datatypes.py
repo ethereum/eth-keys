@@ -7,7 +7,6 @@ import collections
 from typing import (
     TYPE_CHECKING,
     Any,
-    Tuple,
     Type,
     Union,
 )
@@ -272,7 +271,7 @@ class BaseSignature(LazyBackend, ABC):
 
     def __init__(
         self,
-        rs: Tuple[int, int],
+        rs: tuple[int, int],
         backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
     ) -> None:
         for value in rs:
@@ -293,7 +292,7 @@ class BaseSignature(LazyBackend, ABC):
         return self._s
 
     @property
-    def rs(self) -> Tuple[int, int]:
+    def rs(self) -> tuple[int, int]:
         return (self.r, self.s)
 
     @abstractmethod
@@ -352,7 +351,7 @@ class Signature(BaseSignature):
     def __init__(
         self,
         signature_bytes: bytes = None,
-        vrs: Tuple[int, int, int] = None,
+        vrs: tuple[int, int, int] = None,
         backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
     ) -> None:
         if bool(signature_bytes) is bool(vrs):
@@ -400,7 +399,7 @@ class Signature(BaseSignature):
         self._s = value
 
     @property
-    def vrs(self) -> Tuple[int, int, int]:
+    def vrs(self) -> tuple[int, int, int]:
         return (self.v, self.r, self.s)
 
     def to_bytes(self) -> bytes:
@@ -424,7 +423,7 @@ class NonRecoverableSignature(BaseSignature):
     def __init__(
         self,
         signature_bytes: bytes = None,
-        rs: Tuple[int, int] = None,
+        rs: tuple[int, int] = None,
         backend: "Union[BaseECCBackend, Type[BaseECCBackend], str, None]" = None,
     ) -> None:
         if signature_bytes is None and rs is None:

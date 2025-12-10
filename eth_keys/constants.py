@@ -1,7 +1,3 @@
-from typing import (
-    Tuple,
-)
-
 #
 # SECPK1N
 #
@@ -17,7 +13,7 @@ SECPK1_Gx: int = (
 SECPK1_Gy: int = (
     32670510020758816978083085130507043184471273380659243275938904335757337482424
 )
-SECPK1_G: Tuple[int, int] = (SECPK1_Gx, SECPK1_Gy)
+SECPK1_G: tuple[int, int] = (SECPK1_Gx, SECPK1_Gy)
 
 
 #
