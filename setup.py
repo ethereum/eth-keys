@@ -63,9 +63,7 @@ setup(
     py_modules=["eth_keys"],
     zip_safe=False,
     keywords="ethereum",
-    packages=find_packages(
-        exclude=["scripts", "scripts.*", "tests", "tests.*"]
-    ),
+    packages=find_packages(exclude=["scripts", "scripts.*", "tests", "tests.*"]),
     package_data={"eth_keys": ["py.typed"]},
     classifiers=[
         "Development Status :: 4 - Beta",
