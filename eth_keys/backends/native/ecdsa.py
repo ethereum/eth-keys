@@ -1,12 +1,13 @@
 """
 Functions lifted from https://github.com/vbuterin/pybitcointools
 """
+from collections.abc import (
+    Callable,
+)
 import hashlib
 import hmac
 from typing import (
     Any,
-    Callable,
-    Tuple,
 )
 
 from eth_utils import (
@@ -41,13 +42,13 @@ from .jacobian import (
 )
 
 
-def decode_public_key(public_key_bytes: bytes) -> Tuple[int, int]:
+def decode_public_key(public_key_bytes: bytes) -> tuple[int, int]:
     left = big_endian_to_int(public_key_bytes[0:32])
     right = big_endian_to_int(public_key_bytes[32:64])
     return left, right
 
 
-def encode_raw_public_key(raw_public_key: Tuple[int, int]) -> bytes:
+def encode_raw_public_key(raw_public_key: tuple[int, int]) -> bytes:
     left, right = raw_public_key
     return b"".join(
         (
@@ -119,7 +120,7 @@ def deterministic_generate_k(
     return k
 
 
-def ecdsa_raw_sign(msg_hash: bytes, private_key_bytes: bytes) -> Tuple[int, int, int]:
+def ecdsa_raw_sign(msg_hash: bytes, private_key_bytes: bytes) -> tuple[int, int, int]:
     z = big_endian_to_int(msg_hash)
     msg_hash_mod_n = pad32(int_to_big_endian(z % N))
     k = deterministic_generate_k(msg_hash_mod_n, private_key_bytes)
@@ -134,7 +135,7 @@ def ecdsa_raw_sign(msg_hash: bytes, private_key_bytes: bytes) -> Tuple[int, int,
 
 
 def ecdsa_raw_verify(
-    msg_hash: bytes, rs: Tuple[int, int], public_key_bytes: bytes
+    msg_hash: bytes, rs: tuple[int, int], public_key_bytes: bytes
 ) -> bool:
     raw_public_key = decode_public_key(public_key_bytes)
 
@@ -151,7 +152,7 @@ def ecdsa_raw_verify(
     return bool(r == x and (r % N) and (s % N))
 
 
-def ecdsa_raw_recover(msg_hash: bytes, vrs: Tuple[int, int, int]) -> bytes:
+def ecdsa_raw_recover(msg_hash: bytes, vrs: tuple[int, int, int]) -> bytes:
     v, r, s = vrs
 
     if v not in (0, 1):

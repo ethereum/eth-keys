@@ -11,9 +11,8 @@
 # These methods are NOT intended for external use outside of this project. They do not
 # fully validate inputs and make assumptions that are not *generally* true.
 
-from typing import (
+from collections.abc import (
     Iterator,
-    Tuple,
 )
 
 from eth_utils import (
@@ -54,7 +53,7 @@ def two_int_sequence_encoder(signature_r: int, signature_s: int) -> Iterator[int
     yield from encoded2
 
 
-def two_int_sequence_decoder(encoded: bytes) -> Tuple[int, int]:
+def two_int_sequence_decoder(encoded: bytes) -> tuple[int, int]:
     """
     Decode bytes to two integers using DER, defined as:
 
@@ -110,7 +109,7 @@ def _encode_int(primitive: int) -> Iterator[int]:
     yield from encoded
 
 
-def _decode_int(encoded: bytes) -> Tuple[int, bytes]:
+def _decode_int(encoded: bytes) -> tuple[int, bytes]:
     # See: https://docs.microsoft.com/en-us/windows/desktop/seccertenroll/about-integer
 
     if encoded[0] != 0x02:

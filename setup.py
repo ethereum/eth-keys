@@ -7,16 +7,19 @@ from setuptools import (
 extras_require = {
     "coincurve": [
         "coincurve>=17.0.0",
+        # Coincurve v21.0.0 is broken with python 3.14.
+        # See issue: https://github.com/ofek/coincurve/issues/219
+        "coincurve>=20.0.0,<21.0.0;python_version=='3.14'",
     ],
     "dev": [
         "build>=0.9.0",
         "bump_my_version>=0.19.0",
         "ipython",
-        "mypy==1.10.0",
+        "mypy==1.18.2",
         "pre-commit>=3.4.0",
         "tox>=4.0.0",
         "twine",
-        "wheel",
+        "wheel>=0.38.1",
     ],
     "docs": [
         "towncrier>=24,<25",
@@ -58,10 +61,9 @@ setup(
         "eth-utils>=2",
         "eth-typing>=3",
     ],
-    python_requires=">=3.8, <4",
+    python_requires=">=3.10, <4",
     extras_require=extras_require,
     py_modules=["eth_keys"],
-    license="MIT",
     zip_safe=False,
     keywords="ethereum",
     packages=find_packages(exclude=["scripts", "scripts.*", "tests", "tests.*"]),
@@ -72,11 +74,10 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ],
 )

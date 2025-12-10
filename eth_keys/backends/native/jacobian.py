@@ -1,7 +1,3 @@
-from typing import (
-    Tuple,
-)
-
 from eth_keys.constants import (
     IDENTITY_POINTS,
     SECPK1_A as A,
@@ -22,12 +18,12 @@ def inv(a: int, n: int) -> int:
     return lm % n
 
 
-def to_jacobian(p: Tuple[int, int]) -> Tuple[int, int, int]:
+def to_jacobian(p: tuple[int, int]) -> tuple[int, int, int]:
     o = (p[0], p[1], 1)
     return o
 
 
-def jacobian_double(p: Tuple[int, int, int]) -> Tuple[int, int, int]:
+def jacobian_double(p: tuple[int, int, int]) -> tuple[int, int, int]:
     if not p[1]:
         return (0, 0, 0)
     ysq = (p[1] ** 2) % P
@@ -40,8 +36,8 @@ def jacobian_double(p: Tuple[int, int, int]) -> Tuple[int, int, int]:
 
 
 def jacobian_add(
-    p: Tuple[int, int, int], q: Tuple[int, int, int]
-) -> Tuple[int, int, int]:
+    p: tuple[int, int, int], q: tuple[int, int, int]
+) -> tuple[int, int, int]:
     if not p[1]:
         return q
     if not q[1]:
@@ -65,12 +61,12 @@ def jacobian_add(
     return (nx, ny, nz)
 
 
-def from_jacobian(p: Tuple[int, int, int]) -> Tuple[int, int]:
+def from_jacobian(p: tuple[int, int, int]) -> tuple[int, int]:
     z = inv(p[2], P)
     return ((p[0] * z**2) % P, (p[1] * z**3) % P)
 
 
-def jacobian_multiply(a: Tuple[int, int, int], n: int) -> Tuple[int, int, int]:
+def jacobian_multiply(a: tuple[int, int, int], n: int) -> tuple[int, int, int]:
     if a[1] == 0 or n == 0:
         return (0, 0, 1)
     if n == 1:
@@ -85,13 +81,13 @@ def jacobian_multiply(a: Tuple[int, int, int], n: int) -> Tuple[int, int, int]:
         raise Exception("Invariant: Unreachable code path")
 
 
-def fast_multiply(a: Tuple[int, int], n: int) -> Tuple[int, int]:
+def fast_multiply(a: tuple[int, int], n: int) -> tuple[int, int]:
     return from_jacobian(jacobian_multiply(to_jacobian(a), n))
 
 
-def fast_add(a: Tuple[int, int], b: Tuple[int, int]) -> Tuple[int, int]:
+def fast_add(a: tuple[int, int], b: tuple[int, int]) -> tuple[int, int]:
     return from_jacobian(jacobian_add(to_jacobian(a), to_jacobian(b)))
 
 
-def is_identity(p: Tuple[int, int, int]) -> bool:
+def is_identity(p: tuple[int, int, int]) -> bool:
     return p in IDENTITY_POINTS
