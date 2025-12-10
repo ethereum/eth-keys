@@ -352,12 +352,6 @@ jobs:
       - image: cimg/python:3.13
         environment:
           TOXENV: py313-backends-coincurve21
-  py314-backends-coincurve21:
-    <<: *common
-    docker:
-      - image: cimg/python:3.14
-        environment:
-          TOXENV: py314-backends-coincurve21
 
 define: &all_jobs
   - docs
@@ -395,7 +389,6 @@ define: &all_jobs
   - py311-backends-coincurve21
   - py312-backends-coincurve21
   - py313-backends-coincurve21
-  - py314-backends-coincurve21
 
 workflows:
   version: 2
