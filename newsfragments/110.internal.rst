@@ -1,0 +1,1 @@
+Remove unneeded from typing import Type in eth_keys/backends/__init__.py
