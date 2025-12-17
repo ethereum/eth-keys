@@ -1,3 +1,24 @@
+eth-keys v0.8.0-beta.1 (2025-12-17)
+-----------------------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- Drops support for Python 3.8 and 3.9. (`#109 <https://github.com/ethereum/eth-keys/issues/109>`__)
+
+
+Features
+~~~~~~~~
+
+- Adds support for Python 3.14 (`#109 <https://github.com/ethereum/eth-keys/issues/109>`__)
+
+
+Internal Changes - for eth-keys Contributors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Remove unneeded from typing import Type in eth_keys/backends/__init__.py (`#110 <https://github.com/ethereum/eth-keys/issues/110>`__)
+
+
 eth-keys v0.7.0 (2025-04-07)
 ----------------------------
 
