@@ -49,7 +49,7 @@ with open("./README.md") as readme:
 setup(
     name="eth-keys",
     # *IMPORTANT*: Don't manually change the version here. Use `make bump`, as described in readme
-    version="0.7.0",
+    version="0.8.0-beta.1",
     description="""eth-keys: Common API for Ethereum key operations""",
     long_description=long_description,
     long_description_content_type="text/markdown",
